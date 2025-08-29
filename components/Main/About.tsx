@@ -1,13 +1,12 @@
 import React from "react";
+import { ShineBorder } from "@/components/magicui/shine-border"
 
 const aboutSections = [
   {
     title: "Who are we?",
     content: `ASCIEE is a vibrant community driven by curiosity, innovation, and a passion for learning.
-    It’s more than just a community — it’s a place where knowledge meets creativity and ideas come alive.
-    Here, like minded engineers connect, collaborate, and grow together.
-    We empower students to explore, experiment, and excel in the world of technology.
-    At ASCIEE, imagination knows no limits, and engineers evolve as one.`,
+it’s a place where knowledge meets creativity and ideas come alive where like minded engineers can connect, collaborate, and grow together.
+We empower students to experiment, and excel in the world of technology.`,
   },
   {
     title: "What we Do?",
@@ -30,6 +29,7 @@ const About = () => {
             key={idx}
             className="p-8 rounded-2xl backdrop-blur-xl bg-foreground/70 border-r border-white/20 text-white shadow-lg hover:shadow-2xl hover:scale-105 transition-transform duration-300"
           >
+            <ShineBorder duration={15} borderWidth={1.2} shineColor="white" />
             <h2 className="text-2xl font-semibold mb-4 text-center">
               {section.title}
             </h2>

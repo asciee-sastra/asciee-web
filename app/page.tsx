@@ -1,19 +1,20 @@
-
-
-import About from "@/components/About";
-import FAQsThree from "@/components/Faqs";
-import Hero from "@/components/Hero";
-import Header from "@/components/Navbar";
-
+import About from "@/components/Main/About";
+import Clusters from "@/components/Main/Clusters";
+import FAQsThree from "@/components/Main/Faqs";
+import Hero from "@/components/Main/Hero";
+import Marquee from "@/components/Marquee";
+import Header from "@/components/Main/Navbar";
+import Footer from "@/components/Main/Footer";
 
 export default function Home() {
   return (
     <>
-
-    <Header />
-    <Hero/>
-    <About />
-    <FAQsThree/>
+      <Header />
+      <Hero />
+      <About />
+      <Clusters />
+      <FAQsThree />
+      <Footer />
     </>
   );
 }

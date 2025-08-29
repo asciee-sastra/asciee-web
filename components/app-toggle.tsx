@@ -4,6 +4,7 @@ import { useId } from "react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { Calendar, ShoppingCart, User, Workflow } from "lucide-react"
 
 export default function AppToggle() {
   const id = useId()
@@ -35,22 +36,22 @@ export default function AppToggle() {
         data-state={selectedValue}
       >
         <label className="relative z-10 inline-flex h-full min-w-8 cursor-pointer items-center justify-center px-3 whitespace-nowrap transition-colors select-none group-data-[state=coordinators]:text-white">
-          <Link href="/coordinators">Coordinators</Link>
+          <User className="mr-2 size-5" /> <Link href="/coordinators">Coordinators</Link>
           <RadioGroupItem id={`${id}-coordinators`} value="coordinators" className="sr-only" />
         </label>
 
         <label className="relative z-10 inline-flex h-full min-w-8 cursor-pointer items-center justify-center px-3 whitespace-nowrap transition-colors select-none group-data-[state=inventory]:text-white">
-          <Link href="/inventory">Inventory</Link>
+          <ShoppingCart className="mr-2 size-5" /> <Link href="/inventory">Inventory</Link>
           <RadioGroupItem id={`${id}-inventory`} value="inventory" className="sr-only" />
         </label>
 
         <label className="relative z-10 inline-flex h-full min-w-8 cursor-pointer items-center justify-center px-3 whitespace-nowrap transition-colors select-none group-data-[state=projects]:text-white">
-          <Link href="/projects">Projects</Link>
+          <Workflow className="mr-2 size-5" /> <Link href="/projects">Projects</Link>
           <RadioGroupItem id={`${id}-projects`} value="projects" className="sr-only" />
         </label>
 
         <label className="relative z-10 inline-flex h-full min-w-8 cursor-pointer items-center justify-center px-3 whitespace-nowrap transition-colors select-none group-data-[state=events]:text-white">
-          <Link href="/events">Events</Link>
+          <Calendar className="mr-2 size-5" /> <Link href="/events">Events</Link>
           <RadioGroupItem id={`${id}-events`} value="events" className="sr-only" />
         </label>
       </RadioGroup>
