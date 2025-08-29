@@ -21,7 +21,7 @@ const Clusters = () => {
         {teams.map((team) => (
           <div
             key={team.id}
-            className="relative w-[320px] h-[320px] rounded-4xl overflow-auto group cursor-pointer"
+            className="relative w-[320px] h-[320px] rounded-4xl overflow-hidden group cursor-pointer"
           >
             {/* Image */}
             <Image
@@ -35,7 +35,7 @@ const Clusters = () => {
             {/* Progressive blur caption */}
             <ProgressiveBlur height="25%" position="bottom" />
             <div
-              className=" overflow-hidden text-2xl text-black font-semibold z-50 absolute bottom-0 left-0 right-0 p-2 text-center
+              className="overflow-hidden text-xl text-black font-semibold z-50 absolute bottom-0 left-0 right-0 p-2 text-center
                 transition-all duration-500 transform group-hover:scale-110 group-hover:opacity-90"
             >
               {team.title}
