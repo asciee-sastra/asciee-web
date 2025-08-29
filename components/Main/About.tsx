@@ -1,5 +1,5 @@
 import React from "react";
-import { ShineBorder } from "@/components/magicui/shine-border"
+import { ShineBorder } from "@/components/magicui/shine-border";
 
 const aboutSections = [
   {
