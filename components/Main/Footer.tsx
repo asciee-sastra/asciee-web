@@ -91,7 +91,7 @@ const Footer = () => {
       {/* Bottom Text */}
       <div className="border-t border-white/10 mt-8 pt-6 text-center text-md text-gray-400">
         <p>
-          Design and Dev by{" "}
+          Designed and Developed by{" "}
           <Link
             className="underline text-lg font-extrabold leading-relaxed hover:text-purple-400"
             href="https://saifbuilds.vercel.app/"
