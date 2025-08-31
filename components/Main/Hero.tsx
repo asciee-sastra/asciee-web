@@ -2,40 +2,52 @@ import Image from "next/image";
 import React from "react";
 import logo from "@/public/asciee.jpg";
 import { Tilt } from "../motion-primitives/tilt";
-import { ShoppingCart, Calendar } from "lucide-react";
 import { Button } from "../ui/button";
-import { GlowEffectButton } from "../button-glow";
+import { Boxes, Calendar } from "lucide-react";
 
 const Hero = () => {
   return (
-    <>
-      <div className="w-full z-50 mt-8 flex flex-col justify-center items-center relative">
-        <div className="w-full z-50 mt-8 flex flex-col justify-center items-center relative">
-          <Tilt rotationFactor={24} isRevese>
-            <Image
-              src={logo}
-              width={280}
-              height={280}
-              alt="ASCIEE Logo"
-              className="rounded-full"
-            />
-          </Tilt>
-          <div className="flex justify-center mt-2 flex-col items-center">
-            <div>
-              <h1 className="text-5xl font-bold text-white">ASCIEE</h1>
-            </div>
-            <p className="text-xl text-center w-3/4 md:w-1/2 text-white">
-              Association for the Students of Communication, Instrumentation,
-              Electrical & Electronics
-            </p>
-            <div className="flex justify-center mt-4 items-center gap-4">
-              <GlowEffectButton name="Upcoming Events" icon="calendar" />
-              <GlowEffectButton name="Inventory" icon="shopping-cart" />
-            </div>
-          </div>
-        </div>
+    <section className="w-full min-h-screen flex flex-col justify-center items-center text-center px-6 relative">
+      {/* Logo with tilt effect */}
+      <Tilt rotationFactor={24} isRevese>
+        <Image
+          src={logo}
+          width={260}
+          height={260}
+          alt="ASCIEE Logo"
+          className="rounded-full md:mt-6 shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.5)] transition-all duration-500"
+        />
+      </Tilt>
+
+      {/* Title + tagline */}
+      <div className="mt-6 flex flex-col items-center">
+        <h1 className="text-4xl md:text-6xl font-bold text-white tracking-wide drop-shadow-lg">
+          ASCIEE
+        </h1>
+        <p className="mt-3 text-md md:text-xl md:max-w-lg text-white/90 leading-relaxed">
+          Association for the Students of Communication, Instrumentation,
+          Electrical & Electronics
+        </p>
       </div>
-    </>
+
+      {/* CTA Buttons */}
+      <div className="mt-4 flex flex-col sm:flex-row gap-3">
+        <Button
+          
+          variant="default"
+          className="flex items-center gap-2 bg-foreground/70 text-md text-white rounded-3xl px-8 py-5 border border-white/20 backdrop-blur-sm hover:scale-105 hover:bg-white/20 hover:text-white transition-all"
+        >
+          <Calendar className="h-5 w-5" /> Upcoming Events
+        </Button>
+
+        <Button
+          
+          className="flex items-center gap-2 bg-foreground/80 text-md text-white rounded-3xl px-8 py-5 border border-white/20 backdrop-blur-sm hover:scale-105 hover:bg-white/20 hover:text-white transition-all"
+        >
+          <Boxes className="h-6 w-6" /> Inventory
+        </Button>
+      </div>
+    </section>
   );
 };
 

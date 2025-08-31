@@ -1,50 +1,50 @@
+"use client"
+
 import React from "react";
 import Image from "next/image";
 import design from "@/public/design.jpg";
 import content from "@/public/content.jpg";
 import inventory from "@/public/inventory.jpg";
 import pr from "@/public/pr.jpg";
-import { ProgressiveBlur } from "@/components/magicui/progressive-blur";
 
-const Clusters = () => {
-  const teams = [
-    { id: 1, image: design, title: "Design" },
-    { id: 2, image: pr, title: "Promotions and Outreach" },
-    { id: 3, image: content, title: "Content Writing" },
-    { id: 4, image: inventory, title: "Inventory Management" },
-  ];
+const teams = [
+  { id: 1, image: design, title: "Design" },
+  { id: 2, image: pr, title: "Promotions & Outreach" },
+  { id: 3, image: content, title: "Content Writing" },
+  { id: 4, image: inventory, title: "Inventory Management" },
+];
 
+export default function Clusters() {
   return (
-    <div className="w-full flex flex-col mb-16 items-center text-center">
-      <h2 className="text-4xl text-white font-bold mb-6">Clusters</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {teams.map((team) => (
+    <section className="w-full flex flex-col items-center text-center mb-16">
+      {/* Heading */}
+      <h2 className="text-4xl md:text-5xl font-bold text-white mb-10 tracking-tight">
+        Clusters
+      </h2>
+
+      {/* Card Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {teams.map(({ id, image, title }) => (
           <div
-            key={team.id}
-            className="relative w-[320px] h-[320px] rounded-4xl overflow-hidden group cursor-pointer"
+            key={id}
+            className="group flex flex-col items-center rounded-3xl overflow-hidden shadow-lg border border-white/10 
+                       bg-foreground backdrop-blur-xl px-2 py-2 max-h-[500px] transition-transform duration-500 hover:scale-105 hover:shadow-2xl"
           >
             {/* Image */}
-            <Image
-              src={team.image}
-              alt={team.title}
-              width={300}
-              height={300}
-              className="w-full h-full rounded-4xl object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-
-            {/* Progressive blur caption */}
-            <ProgressiveBlur height="25%" position="bottom" />
-            <div
-              className="overflow-hidden text-xl text-black font-semibold z-50 absolute bottom-0 left-0 right-0 p-2 text-center
-                transition-all duration-500 transform group-hover:scale-110 group-hover:opacity-90"
-            >
-              {team.title}
+            <div className="relative w-[300px] h-[300px] rounded-2xl overflow-hidden mb-4">
+              <Image
+                src={image}
+                alt={title}
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-500"
+              />
             </div>
+
+            {/* Text */}
+            <h3 className="text-xl font-semibold mb-3 text-white">{title}</h3>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
-};
-
-export default Clusters;
+}

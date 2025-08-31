@@ -7,16 +7,23 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { Menu, MessagesSquare, Calendar, ShoppingCart, User, Workflow } from "lucide-react"
+import {
+  Menu,
+  MessagesSquare,
+  Calendar,
+  ShoppingCart,
+  Users,
+  Workflow,
+  Boxes,
+} from "lucide-react"
 import Link from "next/link"
-import { Button } from "./ui/button"
 import Image from "next/image"
 import logo from "@/public/asciee.jpg"
 import React from "react"
 
 const NAV_ITEMS = [
-  { name: "Coordinators", href: "/coordinators", icon: User },
-  { name: "Inventory", href: "/inventory", icon: ShoppingCart },
+  { name: "Coordinators", href: "/coordinators", icon: Users },
+  { name: "Inventory", href: "/inventory", icon: Boxes },
   { name: "Projects", href: "/projects", icon: Workflow },
   { name: "Events", href: "/events", icon: Calendar },
 ]
@@ -25,49 +32,53 @@ export default function Hamenu() {
   return (
     <Sheet>
       {/* Hamburger Button */}
-      <SheetTrigger className="p-2 rounded-md hover:bg-white/10 focus:outline-none">
+      <SheetTrigger className="p-2 rounded-xl hover:bg-white/10 transition focus:outline-none">
         <Menu size={28} />
       </SheetTrigger>
 
       {/* Sidebar Content with Glass Effect */}
       <SheetContent
         side="left"
-        className="backdrop-blur-xl bg-white/10 border-r border-white/20 text-white p-6 flex flex-col justify-between"
+        className="backdrop-blur-2xl bg-white/10 border-r border-white/20 
+                   text-white p-6 flex flex-col justify-between 
+                   shadow-2xl rounded-r-3xl"
       >
         {/* Header */}
         <SheetHeader>
-          <SheetTitle className="text-white flex gap-3 text-2xl font-bold">
+          <SheetTitle className="flex items-center gap-3 text-2xl font-bold text-white">
             <Image
               src={logo}
-              width={36}
-              height={36}
-              className="rounded-full transition-shadow"
+              width={40}
+              height={40}
+              className="rounded-full border border-white/20 shadow-md"
               alt="ASCIEE Logo"
             />
-            <h1 className="text-3xl font-bold">ASCIEE</h1>
+            <span className="text-3xl font-bold tracking-wide">ASCIEE</span>
           </SheetTitle>
         </SheetHeader>
 
         {/* Navigation */}
-        <div className="flex flex-1 flex-col mb-24 justify-center">
-        <nav className="flex flex-col  space-y-6">
+        <div className="flex flex-1 flex-col justify-center space-y-8">
           {NAV_ITEMS.map(({ name, href, icon: Icon }) => (
             <Link
               key={href}
               href={href}
-              className="flex items-center ml-8 gap-3 text-white/80 text-3xl hover:text-white transition-colors"
+              className="flex items-center gap-4 text-lg font-medium text-white/80 
+                         hover:text-white hover:scale-105 transition-transform"
             >
-              <Icon size={26} />
+              <Icon size={28} />
               {name}
             </Link>
           ))}
+        </div>
 
-          <div className="flex justify-center w-3/4">
-            <button className="flex items-center gap-2 px-4 text-xl py-2 bg-purple-600 hover:bg-purple-700 transition rounded-full font-medium">
-              <MessagesSquare size={24} aria-hidden="true" /> Feedback
-            </button>
-          </div>
-        </nav>
+        {/* Feedback Button */}
+        <div className="flex justify-center mb-4">
+          <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-800 
+                              hover:from-purple-700 hover:to-purple-900 
+                              transition-all rounded-full text-lg font-medium shadow-lg">
+            <MessagesSquare size={22} aria-hidden="true" /> Feedback
+          </button>
         </div>
       </SheetContent>
     </Sheet>

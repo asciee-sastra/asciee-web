@@ -17,7 +17,7 @@ export function GlowEffectButton({ name, icon }: GlowEffectButtonProps) {
         duration={3}
         scale={0.9}
       />
-      <button className="relative inline-flex items-center gap-1 rounded-4xl bg-foreground px-4 py-2 text-sm text-zinc-50 outline outline-1 outline-[#fff2f21f]">
+      <button className="relative inline-flex items-center gap-1 rounded-4xl bg-foreground px-4 py-2 text-sm text-zinc-50 outline outline-[#fff2f21f]">
         <DynamicIcon name={icon} className="m-auto size-5" />
         {name}
       </button>

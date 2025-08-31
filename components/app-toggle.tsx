@@ -4,7 +4,7 @@ import { useId } from "react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Calendar, ShoppingCart, User, Workflow } from "lucide-react"
+import { Calendar, ShoppingCart, Users, Workflow } from "lucide-react"
 
 export default function AppToggle() {
   const id = useId()
@@ -36,7 +36,7 @@ export default function AppToggle() {
         data-state={selectedValue}
       >
         <label className="relative z-10 inline-flex h-full min-w-8 cursor-pointer items-center justify-center px-3 whitespace-nowrap transition-colors select-none group-data-[state=coordinators]:text-white">
-          <User className="mr-2 size-5" /> <Link href="/coordinators">Coordinators</Link>
+          <Users className="mr-2 size-5" /> <Link href="/coordinators">Coordinators</Link>
           <RadioGroupItem id={`${id}-coordinators`} value="coordinators" className="sr-only" />
         </label>
 
