@@ -44,7 +44,7 @@ const Hero = () => {
 
         <Link href="/inventory">
           <Button
-            className="flex items-center gap-2 bg-foreground/80 text-md text-white rounded-3xl px-8 py-5 border border-white/20 backdrop-blur-sm hover:scale-105 hover:bg-white/20 hover:text-white transition-all"
+            className="flex items-center mx-auto gap-2 bg-foreground/80 text-md text-white rounded-3xl px-8 py-5 border border-white/20 backdrop-blur-sm hover:scale-105 hover:bg-white/20 hover:text-white transition-all"
           >
             <Boxes className="h-6 w-6" /> Inventory
           </Button>
