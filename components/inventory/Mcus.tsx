@@ -66,15 +66,15 @@ export default function Mcus() {
         Microcontrollers & Components
       </h1>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-4 place-items-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {mcus.map((mcu) => (
           <div
             key={mcu.id}
             className="group flex flex-col items-center rounded-3xl overflow-hidden shadow-lg border border-white/10 
-                       bg-foreground backdrop-blur-xl px-2 py-2 max-h-[500px] transition-transform duration-500 hover:scale-105 hover:shadow-2xl"
+                       bg-foreground backdrop-blur-xl w-fit px-2 py-2 max-h-[500px] transition-transform duration-500 hover:scale-105 hover:shadow-2xl"
           >
             {/* Image */}
-            <div className="relative w-[300px] h-[300px] rounded-2xl overflow-hidden mb-4 bg-white">
+            <div className="relative w-[280px] h-[280px] rounded-2xl overflow-hidden mb-4 bg-white">
               {mcu.path ? (
                 <Image
                   src={`${STORAGE_URL}/${mcu.path}`}
