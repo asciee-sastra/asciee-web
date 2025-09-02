@@ -70,7 +70,7 @@ export default function Sensors() {
         Sensors
       </h1>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-4 place-items-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {visibleSensors.map((sensor) => (
           <div
             key={sensor.id}
@@ -78,7 +78,7 @@ export default function Sensors() {
                        bg-foreground backdrop-blur-xl px-2 py-2 max-h-[500px] transition-transform duration-500 hover:scale-105 hover:shadow-2xl"
           >
             {/* Image */}
-            <div className="relative w-[300px] h-[300px] rounded-2xl overflow-hidden mb-4">
+            <div className="relative w-[280px] h-[280px] rounded-2xl overflow-hidden mb-4">
               <Image
                 src={`${STORAGE_URL}/${sensor.path}`}
                 alt={sensor.name}

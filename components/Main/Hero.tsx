@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import Link from "next/link";
 import logo from "@/public/asciee.jpg";
 import { Tilt } from "../motion-primitives/tilt";
 import { Button } from "../ui/button";
@@ -32,20 +33,22 @@ const Hero = () => {
 
       {/* CTA Buttons */}
       <div className="mt-4 flex flex-col sm:flex-row gap-3">
-        <Button
-          
-          variant="default"
-          className="flex items-center gap-2 bg-foreground/70 text-md text-white rounded-3xl px-8 py-5 border border-white/20 backdrop-blur-sm hover:scale-105 hover:bg-white/20 hover:text-white transition-all"
-        >
-          <Calendar className="h-5 w-5" /> Upcoming Events
-        </Button>
+        <Link href="/events">
+          <Button
+            variant="default"
+            className="flex items-center gap-2 bg-foreground/70 text-md text-white rounded-3xl px-8 py-5 border border-white/20 backdrop-blur-sm hover:scale-105 hover:bg-white/20 hover:text-white transition-all"
+          >
+            <Calendar className="h-5 w-5" /> Upcoming Events
+          </Button>
+        </Link>
 
-        <Button
-          
-          className="flex items-center gap-2 bg-foreground/80 text-md text-white rounded-3xl px-8 py-5 border border-white/20 backdrop-blur-sm hover:scale-105 hover:bg-white/20 hover:text-white transition-all"
-        >
-          <Boxes className="h-6 w-6" /> Inventory
-        </Button>
+        <Link href="/inventory">
+          <Button
+            className="flex items-center gap-2 bg-foreground/80 text-md text-white rounded-3xl px-8 py-5 border border-white/20 backdrop-blur-sm hover:scale-105 hover:bg-white/20 hover:text-white transition-all"
+          >
+            <Boxes className="h-6 w-6" /> Inventory
+          </Button>
+        </Link>
       </div>
     </section>
   );
