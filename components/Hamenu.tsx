@@ -15,6 +15,7 @@ import {
   Users,
   Workflow,
   Boxes,
+  Home,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -22,6 +23,7 @@ import logo from "@/public/asciee.jpg"
 import React from "react"
 
 const NAV_ITEMS = [
+  { name: "Home", href: "/", icon: Home },
   { name: "Coordinators", href: "/coordinators", icon: Users },
   { name: "Inventory", href: "/inventory", icon: Boxes },
   { name: "Projects", href: "/projects", icon: Workflow },

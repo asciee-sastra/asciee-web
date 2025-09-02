@@ -129,7 +129,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-[#1a0020] text-white;
+    @apply text-white;
   }
 }
 
@@ -165,7 +165,7 @@
 }
 
 .animate-spin-slow {
-  animation: spin-slow 18s linear infinite;
+  animation: spin-slow 5s linear infinite;
 }
 
 

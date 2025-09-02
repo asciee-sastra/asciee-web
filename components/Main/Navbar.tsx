@@ -3,12 +3,15 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import logo from "@/public/asciee.jpg"
-import { Users, Boxes, Calendar, MessageSquare, Workflow, Menu } from "lucide-react"
+import { Users, Boxes, Calendar, MessageSquare, Workflow, Home } from "lucide-react"
 import Hamenu from "../Hamenu"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
-const Header = () => {
+const Navbar = () => {
   const [visible, setVisible] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
+  const pathname = usePathname()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,6 +26,15 @@ const Header = () => {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [lastScrollY])
+
+  // nav items
+  const navItems = [
+    {name: "Home", href: "/", icon: Home},
+    { name: "Coordinators", href: "/coordinators", icon: Users },
+    { name: "Inventory", href: "/inventory", icon: Boxes },
+    { name: "Projects", href: "/projects", icon: Workflow },
+    { name: "Events", href: "/events", icon: Calendar },
+  ]
 
   return (
     <header
@@ -55,18 +67,19 @@ const Header = () => {
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-2 bg-white/5 px-3 py-2 rounded-full backdrop-blur-sm border border-white/10 z-10">
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full text-sm text-white bg-gradient-to-r from-[#720E9E] to-[#9D4EDD] shadow-md transition hover:shadow-[0_0_15px_#720E9E]">
-            <Users size={18} /> Coordinators
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full text-sm text-white hover:bg-white/10 transition">
-            <Boxes size={18} /> Inventory
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full text-sm text-white hover:bg-white/10 transition">
-            <Workflow size={18} /> Projects
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full text-sm text-white hover:bg-white/10 transition">
-            <Calendar size={18} /> Events
-          </button>
+          {navItems.map(({ name, href, icon: Icon }) => (
+            <Link key={href} href={href}>
+              <button
+                className={`flex items-center gap-2 px-4 py-2 cursor-pointer rounded-full text-sm transition ${
+                  pathname === href
+                    ? "text-white bg-gradient-to-r from-[#720E9E] to-[#9D4EDD] shadow-md shadow-[#720E9E]"
+                    : "text-white hover:bg-white/10"
+                }`}
+              >
+                <Icon size={18} /> {name}
+              </button>
+            </Link>
+          ))}
         </div>
 
         {/* Right Side */}
@@ -86,4 +99,4 @@ const Header = () => {
   )
 }
 
-export default Header
+export default Navbar

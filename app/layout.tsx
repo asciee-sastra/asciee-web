@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#1a0020" />
+        <meta name="theme-color" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-[#581C87] via-[#7C2D92] to-[#4C1D95] animate-aurora-diagonal`}
