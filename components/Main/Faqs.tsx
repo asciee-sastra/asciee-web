@@ -81,7 +81,7 @@ b) Non-technical skills like teamwork, documentation, and event management are a
                 <AccordionItem
                   key={item.id}
                   value={item.id}
-                  className="backdrop-blur-xl bg-foreground/70 text-white shadow-xs rounded-lg border px-4 last:border-b"
+                  className="glass-card text-white shadow-xs rounded-lg border px-4 last:border-b"
                 >
                   <AccordionTrigger className="cursor-pointer items-center py-5 hover:no-underline">
                     <div className="flex items-center gap-3">

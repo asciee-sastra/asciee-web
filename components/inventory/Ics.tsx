@@ -38,7 +38,7 @@ export default function ICsList() {
       {/* IC List */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {ics.map((ic) => (
-          <Card key={ic.id} className="rounded-2xl bg-foreground/80 shadow-md">
+          <Card key={ic.id} className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-md">
             <CardHeader>
               <CardTitle className="text-lg">{ic.name}</CardTitle>
             </CardHeader>

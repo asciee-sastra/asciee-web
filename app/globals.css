@@ -92,7 +92,7 @@
 
 .dark {
   --background: #720E9E ;
-  --foreground: rgba(20,0,25,0.6) ;
+  --foreground: rgba(20,0,40,0.6) ;
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
@@ -133,39 +133,10 @@
   }
 }
 
-/* globals.css */
-
-/* globals.css */
-
-/* Aurora diagonal gradient */
-@keyframes aurora-diagonal {
-  0% {
-    background-position: 0% 0%;
+@layer components {
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl shadow-lg;
   }
-  50% {
-    background-position: 100% 100%;
-  }
-  100% {
-    background-position: 0% 0%;
-  }
-}
-
-.animate-aurora-diagonal {
-  background-size: 400% 400%;
-  animation: aurora-diagonal 8s ease-in-out infinite;
-}
-
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin-slow {
-  animation: spin-slow 5s linear infinite;
 }
 
 

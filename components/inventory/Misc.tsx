@@ -69,7 +69,7 @@ export default function MiscComponents() {
           <Card
             key={misc.id}
             className="group flex flex-col items-center justify-center rounded-3xl overflow-hidden 
-                       shadow-lg border border-white/10 bg-foreground/70 backdrop-blur-xl px-4 py-6 
+                       shadow-lg border bg-white/5 backdrop-blur-md border-white/10 px-4 py-6 
                        transition-transform duration-500 hover:scale-105 hover:shadow-2xl text-center"
           >
             <Cable className="w-8 h-8 mb-3 text-primary" />

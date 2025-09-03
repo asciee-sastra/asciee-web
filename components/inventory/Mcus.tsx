@@ -70,8 +70,7 @@ export default function Mcus() {
         {mcus.map((mcu) => (
           <div
             key={mcu.id}
-            className="group flex flex-col items-center rounded-3xl overflow-hidden shadow-lg border border-white/10 
-                       bg-foreground backdrop-blur-xl w-fit px-2 py-2 max-h-[500px] transition-transform duration-500 hover:scale-105 hover:shadow-2xl"
+            className="group flex flex-col items-center rounded-3xl overflow-hidden shadow-lg border glass-card w-fit px-2 py-2 max-h-[500px] transition-transform duration-500 hover:scale-105 hover:shadow-2xl"
           >
             {/* Image */}
             <div className="relative w-[280px] h-[280px] rounded-2xl overflow-hidden mb-4 bg-white">
@@ -93,14 +92,14 @@ export default function Mcus() {
             <h3 className="text-lg font-semibold mb-2 text-white text-center">
               {mcu.name}
             </h3>
-            <p className="flex items-center gap-2 bg-foreground/70 text-md text-white rounded-3xl px-5 py-2 border border-white/20 backdrop-blur-sm hover:scale-105 hover:bg-white/20 hover:text-white transition-all">
+            <p className="flex items-center gap-2 bg-foreground text-md text-white rounded-3xl px-5 py-2 border border-white/20 backdrop-blur-sm hover:scale-105 hover:bg-white/20 hover:text-white transition-all">
               <Package className="w-4 h-4 inline-block" />
               In Stock:
               <span
                 className={
                   mcu.stock > 0
                     ? "font-semibold text-green-500"
-                    : "font-semibold text-red-400"
+                    : "font-semibold text-red-400 text-2xl"
                 }
               >
                 {mcu.stock}

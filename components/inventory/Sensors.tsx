@@ -74,8 +74,7 @@ export default function Sensors() {
         {visibleSensors.map((sensor) => (
           <div
             key={sensor.id}
-            className="group flex flex-col items-center rounded-3xl overflow-hidden shadow-lg border border-white/10 
-                       bg-foreground backdrop-blur-xl px-2 py-2 max-h-[500px] transition-transform duration-500 hover:scale-105 hover:shadow-2xl"
+            className="group flex flex-col items-center rounded-3xl overflow-hidden shadow-lg border glass-card px-2 py-2 max-h-[500px] transition-transform duration-500 hover:scale-105 hover:shadow-2xl"
           >
             {/* Image */}
             <div className="relative w-[280px] h-[280px] rounded-2xl overflow-hidden mb-4">

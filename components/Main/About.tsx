@@ -30,10 +30,10 @@ const About = () => {
           <div
             key={idx}
             className="relative flex flex-col items-center p-8 rounded-3xl 
-                       bg-foreground backdrop-blur-xl border border-white/10 shadow-lg 
+                       glass-card shadow-lg 
                        transition-transform duration-500 hover:scale-105 hover:shadow-2xl"
           >
-            {/* Shine border effect */}
+            
            
 
             {/* Card Content */}

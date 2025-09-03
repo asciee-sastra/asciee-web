@@ -9,8 +9,7 @@ const Footer = () => {
   return (
     <footer
       className="z-50
-       bg-[#1a0020]
-      backdrop-blur-xl text-white py-10"
+       bg-[#1a0020] text-white py-10"
     >
       <div className="container mx-auto flex flex-col md:flex-row items-center justify-center gap-12">
         {/* Logo */}
@@ -89,19 +88,26 @@ const Footer = () => {
       </div>
 
       {/* Bottom Text */}
-      <div className="border-t border-white/10 mt-8 pt-6 text-center text-md text-gray-400">
-        <p>
-          Designed and Developed by{" "}
-          <Link
-            className="underline text-lg font-extrabold leading-relaxed hover:text-purple-400"
-            href="https://saifbuilds.vercel.app/"
-            target="_blank"
-          >
-            Saif
-          </Link>
-        </p>
-        <p>&copy; {new Date().getFullYear()} ASCIEE. All rights reserved.</p>
-      </div>
+      <div className="relative mt-12 pt-6 text-center">
+  {/* Gradient top border */}
+  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-[2px] bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-full"></div>
+
+  <p className="text-gray-400 text-md">
+    Designed and Developed by{" "}
+    <Link
+      href="https://saifbuilds.vercel.app/"
+      target="_blank"
+      className="relative font-extrabold underline text-lg bg-gradient-to-r from-white/30 to-black bg-clip-text hover:from-pink-400 hover:to-purple-500 transition"
+    >
+      Saif
+    </Link>
+  </p>
+
+  <p className="text-gray-500 text-sm mt-2">
+    &copy; {new Date().getFullYear()} ASCIEE. All rights reserved.
+  </p>
+</div>
+
     </footer>
   );
 };
