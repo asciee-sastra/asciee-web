@@ -44,7 +44,7 @@ const Navbar = () => {
     >
       <nav
         className="w-[95%] max-w-6xl flex items-center justify-between 
-        bg-black/30 backdrop-blur-md border-b border-white/10
+        bg-black/10 backdrop-blur-md border-b border-white/10
         rounded-full px-6 py-4
         shadow-[0_8px_30px_rgba(0,0,0,0.25)]
         relative overflow-hidden
