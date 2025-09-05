@@ -33,7 +33,7 @@ export default function RootLayout({
         <meta name="theme-color" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} scroll-smooth antialiased bg-gradient-to-br md:bg-gradient-to-r from-[#0a0a0a] via-[#2b0b33] to-[#0a1a3f]`}
+        className={`${geistSans.variable} ${geistMono.variable} scroll-smooth antialiased bg-gradient-to-br md:bg-gradient-to-r from-[#0a0a0a] to-[#2b0b33] `}
         
       >
         {children}
