@@ -53,12 +53,23 @@
     background-position: 0% 0%;
     }
   }
-}
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite
+;
+  @keyframes marquee {
+  from {
+    transform: translateX(0);}
+  to {
+    transform: translateX(calc(-100% - var(--gap)));}}
+  @keyframes marquee-vertical {
+  from {
+    transform: translateY(0);}
+  to {
+    transform: translateY(calc(-100% - var(--gap)));}}}
 
 :root {
   --radius: 0.625rem;
   --background: #720E9E ;
-  --foreground: rgba(45, 0, 56, 0.6) ;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -92,7 +103,6 @@
 
 .dark {
   --background: #720E9E ;
-  --foreground: rgba(20,0,40,0.6) ;
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
@@ -139,4 +149,11 @@
   }
 }
 
-
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

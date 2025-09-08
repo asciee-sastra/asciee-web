@@ -15,7 +15,7 @@ import MiscComponents from "@/components/inventory/Misc";
 const Page = () => {
   return (
     <>
-      <Navbar />
+      
 
       <div className=" mx-auto mt-24 px-4">
         <Accordion

@@ -9,7 +9,7 @@ const Footer = () => {
   return (
     <footer
       className="z-50
-       bg-[#1a0020] text-white py-10"
+       bg-[#1a0020] text-white border-white border-t-1 py-10"
     >
       <div className="container mx-auto flex flex-col md:flex-row items-center justify-center gap-12">
         {/* Logo */}
@@ -97,7 +97,7 @@ const Footer = () => {
     <Link
       href="https://saifbuilds.vercel.app/"
       target="_blank"
-      className="relative font-extrabold underline text-lg bg-gradient-to-r from-white/30 to-black bg-clip-text hover:from-pink-400 hover:to-purple-500 transition"
+      className="relative font-bold underline text-lg text-white"
     >
       Saif
     </Link>

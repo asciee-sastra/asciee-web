@@ -1,40 +1,47 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Image from "next/image"
-import logo from "@/public/asciee.jpg"
-import { Users, Boxes, Calendar, MessageSquare, Workflow, Home } from "lucide-react"
-import Hamenu from "../Hamenu"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import logo from "@/public/asciee.jpg";
+import {
+  Users,
+  Boxes,
+  Calendar,
+  MessageSquare,
+  Workflow,
+  Home,
+} from "lucide-react";
+import Hamenu from "../Hamenu";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
-  const [visible, setVisible] = useState(true)
-  const [lastScrollY, setLastScrollY] = useState(0)
-  const pathname = usePathname()
+  const [visible, setVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > lastScrollY) {
-        setVisible(false) // hide on scroll down
+        setVisible(false); // hide on scroll down
       } else {
-        setVisible(true) // show on scroll up
+        setVisible(true); // show on scroll up
       }
-      setLastScrollY(window.scrollY)
-    }
+      setLastScrollY(window.scrollY);
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [lastScrollY])
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
 
   // nav items
   const navItems = [
-    {name: "Home", href: "/", icon: Home},
+    { name: "Home", href: "/", icon: Home },
     { name: "Coordinators", href: "/coordinators", icon: Users },
     { name: "Inventory", href: "/inventory", icon: Boxes },
     { name: "Projects", href: "/projects", icon: Workflow },
     { name: "Events", href: "/events", icon: Calendar },
-  ]
+  ];
 
   return (
     <header
@@ -44,7 +51,7 @@ const Navbar = () => {
     >
       <nav
         className="w-[95%] max-w-6xl flex items-center justify-between 
-        bg-black/30 backdrop-blur-md border-b border-white/10
+        bg-black/10 backdrop-blur-md border-b border-white/10
         rounded-full px-6 py-4
         shadow-[0_8px_30px_rgba(0,0,0,0.25)]
         relative overflow-hidden
@@ -95,7 +102,7 @@ const Navbar = () => {
         </div>
       </nav>
     </header>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

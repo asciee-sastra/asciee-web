@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import Image from "next/image";
 import { CircuitBoard, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -79,6 +85,7 @@ export default function Sensors() {
             {/* Image */}
             <div className="relative w-[280px] h-[280px] rounded-2xl overflow-hidden mb-4">
               <Image
+                unoptimized
                 src={`${STORAGE_URL}/${sensor.path}`}
                 alt={sensor.name}
                 fill

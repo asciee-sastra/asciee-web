@@ -76,6 +76,7 @@ export default function Mcus() {
             <div className="relative w-[280px] h-[280px] rounded-2xl overflow-hidden mb-4 bg-white">
               {mcu.path ? (
                 <Image
+                  unoptimized
                   src={`${STORAGE_URL}/${mcu.path}`}
                   alt={mcu.name}
                   fill
