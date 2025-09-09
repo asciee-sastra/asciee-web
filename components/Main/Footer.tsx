@@ -7,7 +7,7 @@ import { Instagram, Linkedin, MessagesSquare } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer
+    <div
       className="z-50
        bg-[#1a0020] text-white border-white border-t-1 py-10"
     >
@@ -108,7 +108,7 @@ const Footer = () => {
   </p>
 </div>
 
-    </footer>
+    </div>
   );
 };
 

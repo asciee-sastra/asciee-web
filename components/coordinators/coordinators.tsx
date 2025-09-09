@@ -13,6 +13,10 @@ const supabase = createClient(
 );
 
 const STORAGE = {
+  presidents: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/fourthyr`, // 👈 presidents images in 4th year bucket
+  secretaries: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/thirdyr`,
+  jointsecretaries: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/secondyr`, // 👈 joint secretaries images in 2nd year bucket
+  heads: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/thirdyr`,
   secondyr: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/secondyr`,
   thirdyr: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/thirdyr`,
   fourthyr: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/fourthyr`,
@@ -32,27 +36,53 @@ const tabs: { label: string; key: "secondyr" | "thirdyr" | "fourthyr" }[] = [
 ];
 
 export default function CoordinatorsPage() {
+  const [presidents, setPresidents] = useState<Member[]>([]);
+  const [secretaries, setSecretaries] = useState<Member[]>([]);
+  const [jointSecretaries, setJointSecretaries] = useState<Member[]>([]);
+  const [heads, setHeads] = useState<Member[]>([]);
   const [secondYr, setSecondYr] = useState<Member[]>([]);
   const [thirdYr, setThirdYr] = useState<Member[]>([]);
   const [fourthYr, setFourthYr] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"secondyr" | "thirdyr" | "fourthyr">("secondyr");
+  const [activeTab, setActiveTab] = useState<
+    "secondyr" | "thirdyr" | "fourthyr"
+  >("secondyr");
 
   useEffect(() => {
     const fetchData = async () => {
-      const [second, third, fourth] = await Promise.all([
-        supabase.from("secondyr").select("*"),
-        supabase.from("thirdyr").select("*"),
-        supabase.from("fourthyr").select("*"),
-      ]);
+      const [presRes, secRes, jointRes, headsRes, second, third, fourth] =
+        await Promise.all([
+          supabase.from("presidents").select("*"),
+          supabase.from("secretaries").select("*"),
+          supabase.from("jointsec").select("*"),
+          supabase.from("heads").select("*"),
+          supabase.from("secondyr").select("*"),
+          supabase.from("thirdyr").select("*"),
+          supabase.from("fourthyr").select("*"),
+        ]);
 
-      if (second.error || third.error || fourth.error) {
+      if (
+        presRes.error ||
+        secRes.error ||
+        jointRes.error ||
+        headsRes.error ||
+        second.error ||
+        third.error ||
+        fourth.error
+      ) {
         setErrorMsg(
-          `${second.error?.message ?? ""} ${third.error?.message ?? ""} ${fourth.error?.message ?? ""}`.trim()
+          `${presRes.error?.message ?? ""} ${secRes.error?.message ?? ""}
+          ${jointRes.error?.message ?? ""} ${headsRes.error?.message ?? ""}
+          ${second.error?.message ?? ""} ${third.error?.message ?? ""}
+          ${fourth.error?.message ?? ""}`.trim()
         );
       }
 
+      setPresidents(presRes.data || []);
+      setSecretaries(secRes.data || []);
+      setJointSecretaries(jointRes.data || []);
+      setHeads(headsRes.data || []);
       setSecondYr(second.data || []);
       setThirdYr(third.data || []);
       setFourthYr(fourth.data || []);
@@ -77,15 +107,16 @@ export default function CoordinatorsPage() {
     );
 
   const renderGrid = (members: Member[], bucket: keyof typeof STORAGE) => (
-    <div className="grid gap-6 place-items-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="flex flex-wrap justify-center gap-6 mb-16 px-6 sm:px-12 md:px-24">
       {members.map((member) => (
         <Tilt
           key={member.id}
           rotationFactor={10}
           springOptions={{ stiffness: 150, damping: 12 }}
-          className="relative flex flex-col items-center rounded-3xl overflow-hidden shadow-lg border glass-card w-fit max-h-[480px]"
+          className="flex-shrink-0 relative flex flex-col items-center rounded-3xl overflow-hidden shadow-lg border glass-card max-h-[480px]"
+          style={{ width: "260px", height: "320px" }} // 👈 fixed size like before
         >
-          <div className="relative w-[260px] h-[320px] rounded-2xl overflow-hidden">
+          <div className="relative w-full h-full rounded-2xl overflow-hidden">
             {member.path ? (
               <Image
                 src={`${STORAGE[bucket]}/${member.path}`}
@@ -112,7 +143,31 @@ export default function CoordinatorsPage() {
 
   return (
     <section className="mt-24 mb-6 bg-transparent px-6">
-      <h1 className="flex items-center justify-center text-xl md:text-4xl font-bold mb-4 text-white text-center">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl md:text-5xl font-bold text-white">
+          Coordinators
+        </h1>
+        <p className="mt-3 text-base md:text-lg text-gray-300">
+          The ones who make it all possible
+        </p>
+      </div>
+
+      {/* Presidents Section */}
+      {renderGrid(presidents, "presidents")}
+      {/* Secretaries Section */}
+
+      {renderGrid(secretaries, "secretaries")}
+      {/* Joint Secretaries Section */}
+      {renderGrid(jointSecretaries, "jointsecretaries")}
+
+      {/* Heads Section */}
+      <h1 className="flex items-center justify-center text-xl md:text-4xl font-bold mt-16 mb-8 text-white text-center">
+       Cluster Heads
+      </h1>
+      {renderGrid(heads, "heads")}
+
+      {/* Core Members Section */}
+      <h1 className="flex items-center justify-center text-xl md:text-4xl font-bold mt-16 mb-4 text-white text-center">
         Core Members
       </h1>
 
