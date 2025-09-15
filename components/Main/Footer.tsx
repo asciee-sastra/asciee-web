@@ -51,9 +51,9 @@ const Footer = () => {
             >
               Events
             </Link>
-            <button className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-[#720E9E] to-[#9D4EDD] hover:shadow-[0_0_20px_#9D4EDD] transition rounded-full font-medium">
+            <Link target="_blank" href="https://forms.gle/Q99Zs7uYMkRdBjGM6"><button className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-[#720E9E] to-[#9D4EDD] hover:shadow-[0_0_20px_#9D4EDD] transition rounded-full font-medium">
               <MessagesSquare size={20} aria-hidden="true" /> Feedback
-            </button>
+            </button></Link>
           </div>
 
           {/* Vertical separator */}

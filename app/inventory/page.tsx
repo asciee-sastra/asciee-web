@@ -11,13 +11,14 @@ import {
 } from "@/components/ui/accordion";
 import LumpComponents from "@/components/inventory/lump";
 import MiscComponents from "@/components/inventory/Misc";
+import { Button } from "@/components/ui/button"; // ✅ import button
+import { ShoppingCart } from "lucide-react";
 
 const Page = () => {
   return (
     <>
-      
-
-      <div className=" mx-auto mt-24 px-4">
+      <Navbar />
+      <div className="mx-auto mt-24 px-4">
         <Accordion
           type="single"
           collapsible
@@ -25,24 +26,8 @@ const Page = () => {
           defaultValue="mcus"
         >
           {/* MCUs */}
-          <AccordionItem value="mcus">
-            <AccordionTrigger className="text-xl font-bold text-white">
-              Microcontrollers
-            </AccordionTrigger>
-            <AccordionContent>
-              <Mcus />
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* Sensors */}
-          <AccordionItem value="sensors">
-            <AccordionTrigger className="text-xl font-bold text-white">
-              Sensors
-            </AccordionTrigger>
-            <AccordionContent>
-              <Sensors />
-            </AccordionContent>
-          </AccordionItem>
+          <Mcus />
+          <Sensors />
 
           {/* ICs */}
           <AccordionItem value="ics">
@@ -74,6 +59,22 @@ const Page = () => {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+      </div>
+
+      {/* Floating Order Button */}
+      <div className="fixed bottom-6 right-6">
+        <Button
+          asChild
+          className="bg-green-600 text-white w-16 h-16 rounded-full shadow-lg hover:bg-blue-700 transition-all"
+        >
+          <a
+            href="https://forms.gle/JySv6V7AFwp4ZsSd6"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ShoppingCart  className="w-5 h-5"/>
+          </a>
+        </Button>
       </div>
     </>
   );

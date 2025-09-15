@@ -30,9 +30,9 @@ type Member = {
 };
 
 const tabs: { label: string; key: "secondyr" | "thirdyr" | "fourthyr" }[] = [
-  { label: "2nd Year", key: "secondyr" },
-  { label: "3rd Year", key: "thirdyr" },
   { label: "4th Year", key: "fourthyr" },
+  { label: "3rd Year", key: "thirdyr" },
+  { label: "2nd Year", key: "secondyr" },
 ];
 
 export default function CoordinatorsPage() {
@@ -47,19 +47,19 @@ export default function CoordinatorsPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<
     "secondyr" | "thirdyr" | "fourthyr"
-  >("secondyr");
+  >("fourthyr");
 
   useEffect(() => {
     const fetchData = async () => {
       const [presRes, secRes, jointRes, headsRes, second, third, fourth] =
         await Promise.all([
-          supabase.from("presidents").select("*"),
-          supabase.from("secretaries").select("*"),
-          supabase.from("jointsec").select("*"),
-          supabase.from("heads").select("*"),
-          supabase.from("secondyr").select("*"),
-          supabase.from("thirdyr").select("*"),
-          supabase.from("fourthyr").select("*"),
+          supabase.from("presidents").select("*").order("id", { ascending: true }),
+          supabase.from("secretaries").select("*").order("id", { ascending: true }),
+          supabase.from("jointsec").select("*").order("id", { ascending: true }),
+          supabase.from("heads").select("*").order("id", { ascending: true }),
+          supabase.from("secondyr").select("*").order("id", { ascending: true }),
+          supabase.from("thirdyr").select("*").order("id", { ascending: true }),
+          supabase.from("fourthyr").select("*").order("id", { ascending: true }),
         ]);
 
       if (
@@ -94,7 +94,7 @@ export default function CoordinatorsPage() {
 
   if (loading)
     return (
-      <p className="text-center py-10 text-lg font-medium text-muted-foreground">
+      <p className="text-center mt-24 py-10 text-lg font-medium text-muted-foreground">
         Loading coordinators...
       </p>
     );
@@ -124,6 +124,7 @@ export default function CoordinatorsPage() {
                 fill
                 className="object-cover"
                 loading="lazy"
+                unoptimized
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-800">

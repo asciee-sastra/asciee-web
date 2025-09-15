@@ -6,9 +6,9 @@ const MarqueeImg = () => {
   const imgurl = [
     "https://wfnzbcuxhjvjwmazysms.supabase.co/storage/v1/object/public/marquee/1.jpg",
     "https://wfnzbcuxhjvjwmazysms.supabase.co/storage/v1/object/public/marquee/3.jpg",
-    "https://wfnzbcuxhjvjwmazysms.supabase.co/storage/v1/object/public/marquee/IMG_20250228_162950.jpg",
-    "https://wfnzbcuxhjvjwmazysms.supabase.co/storage/v1/object/public/marquee/IMG_20250413_164116.jpg",
-    "https://wfnzbcuxhjvjwmazysms.supabase.co/storage/v1/object/public/marquee/IMG_5864.JPG",
+    "https://wfnzbcuxhjvjwmazysms.supabase.co/storage/v1/object/public/marquee/IMG_5864.jpg",
+    "https://wfnzbcuxhjvjwmazysms.supabase.co/storage/v1/object/public/marquee/IMG_5952%20(1).jpg",
+    "https://wfnzbcuxhjvjwmazysms.supabase.co/storage/v1/object/public/marquee/IMG_5976%20(1).jpg",
   ];
 
   return (
@@ -28,6 +28,7 @@ const MarqueeImg = () => {
                 src={src}
                 alt={`marquee-img-${i}`}
                 fill
+                unoptimized
                 className="object-cover rounded-xl shadow-lg"
               />
             </div>

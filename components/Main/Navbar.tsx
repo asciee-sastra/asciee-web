@@ -91,9 +91,9 @@ const Navbar = () => {
         {/* Right Side */}
         <div className="flex items-center gap-3 z-10">
           {/* Feedback button desktop */}
-          <button className="hidden md:flex px-5 py-2 rounded-full bg-white text-black font-medium items-center gap-2 shadow-md hover:shadow-[0_0_12px_#720E9E] transition">
+          <Link target="_blank" href="https://forms.gle/Q99Zs7uYMkRdBjGM6"><button className="hidden md:flex px-5 py-2 rounded-full bg-white text-black font-medium items-center gap-2 shadow-md hover:shadow-[0_0_12px_#720E9E] transition">
             <MessageSquare size={18} /> Feedback
-          </button>
+          </button></Link>
 
           {/* Hamburger for mobile */}
           <div className="text-white md:hidden">
