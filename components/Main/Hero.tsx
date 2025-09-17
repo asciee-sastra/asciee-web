@@ -16,6 +16,7 @@ const Hero = () => {
           width={220}
           height={220}
           alt="ASCIEE Logo"
+          unoptimized
           className="rounded-full md:mt-6 shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.5)] transition-all duration-500"
         />
       </Tilt>

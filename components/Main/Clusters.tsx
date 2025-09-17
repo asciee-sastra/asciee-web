@@ -35,6 +35,7 @@ export default function Clusters() {
                 src={image}
                 alt={title}
                 fill
+                unoptimized
                 className="object-cover group-hover:scale-110 transition-transform duration-500"
               />
             </div>

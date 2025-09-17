@@ -66,6 +66,7 @@ const Navbar = () => {
             alt="ASCIEE"
             width={36}
             height={36}
+            unoptimized
             className="rounded-full"
           />
           <span className="text-white font-semibold text-lg">ASCIEE</span>

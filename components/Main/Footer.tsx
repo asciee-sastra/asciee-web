@@ -20,6 +20,7 @@ const Footer = () => {
             alt="ASCIEE Logo"
             width={160}
             height={160}
+            unoptimized
           />
         </div>
 
