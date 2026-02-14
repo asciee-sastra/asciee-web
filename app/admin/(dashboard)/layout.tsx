@@ -71,6 +71,15 @@ export default async function AdminLayout({
                         </li>
                         <li>
                             <Link
+                                href="/admin/upcoming-events"
+                                className="flex items-center rounded-lg p-2 text-gray-300 hover:bg-white/10 hover:text-white group"
+                            >
+                                <CalendarDays className="h-5 w-5 text-gray-400 group-hover:text-white" />
+                                <span className="ml-3">Upcoming Events</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
                                 href="/admin/projects"
                                 className="flex items-center rounded-lg p-2 text-gray-300 hover:bg-white/10 hover:text-white group"
                             >

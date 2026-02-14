@@ -122,6 +122,8 @@ export default function CoordinatorsPage() {
                 src={`${STORAGE[bucket]}/${member.path}`}
                 alt={member.name}
                 fill
+                placeholder="blur"
+                blurDataURL="/asciee.jpg"
                 className="object-cover"
                 loading="lazy"
                 unoptimized

@@ -13,6 +13,9 @@ import { Loader2 } from "lucide-react";
 import Navbar from "@/components/Main/Navbar";
 import { motion } from "framer-motion";
 import { Event, EventCard } from "@/components/events/EventCard";
+import UpgoingEvents from "@/components/events/UpcomingEvents";
+import Footer from "@/components/Main/Footer";
+
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -106,6 +109,8 @@ export default function EventsPage() {
     <>
       <Navbar />
       <div className="w-full mt-24 max-w-7xl text-white mx-auto px-4 py-10">
+        <UpgoingEvents />
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -163,6 +168,7 @@ export default function EventsPage() {
             </motion.div>
           ))}
       </div>
+      <Footer />
     </>
   );
 }

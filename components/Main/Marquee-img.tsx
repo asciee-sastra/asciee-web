@@ -4,11 +4,11 @@ import { Marquee } from "../magicui/marquee";
 
 const MarqueeImg = () => {
   const imgurl = [
-    "https://wfnzbcuxhjvjwmazysms.supabase.co/storage/v1/object/public/marquee/1.jpg",
-    "https://wfnzbcuxhjvjwmazysms.supabase.co/storage/v1/object/public/marquee/3.jpg",
-    "https://wfnzbcuxhjvjwmazysms.supabase.co/storage/v1/object/public/marquee/IMG_5864.jpg",
-    "https://wfnzbcuxhjvjwmazysms.supabase.co/storage/v1/object/public/marquee/IMG_5952%20(1).jpg",
-    "https://wfnzbcuxhjvjwmazysms.supabase.co/storage/v1/object/public/marquee/IMG_5976%20(1).jpg",
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/marquee/1.jpg`,
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/marquee/3.jpg`,
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/marquee/IMG_5864.jpg`,
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/marquee/IMG_5952%20(1).jpg`,
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/marquee/IMG_5976%20(1).jpg`,
   ];
 
   return (
