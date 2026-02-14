@@ -38,7 +38,7 @@ export default async function AdminLayout({
     };
 
     return (
-        <div className="flex h-screen text-white">
+        <div className="flex min-h-screen text-white">
             {/* Sidebar */}
             <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-white/10  backdrop-blur-md transition-transform sm:translate-x-0">
                 <div className="flex h-full flex-col px-3 py-4">
@@ -113,7 +113,7 @@ export default async function AdminLayout({
 
             {/* Main Content */}
             <div className="flex-1 sm:ml-64 bg-cover bg-center bg-fixed bg-no-repeat">
-                <div className="mt-14 p-4 lg:ml-0 overflow-y-auto scrollbar-hide">
+                <div className="mt-14 p-4 lg:ml-0">
                     <div className="backdrop-blur-xl border border-white/5 rounded-2xl min-h-[calc(100vh-6rem)] p-6 shadow-2xl">
                         {children}
                     </div>
