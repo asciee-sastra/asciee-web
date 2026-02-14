@@ -13,6 +13,7 @@ import LumpComponents from "@/components/inventory/lump";
 import MiscComponents from "@/components/inventory/Misc";
 import { Button } from "@/components/ui/button"; // ✅ import button
 import { ShoppingCart } from "lucide-react";
+import Footer from "@/components/Main/Footer";
 
 const Page = () => {
   return (
@@ -76,6 +77,7 @@ const Page = () => {
           </a>
         </Button>
       </div>
+      <Footer />
     </>
   );
 };

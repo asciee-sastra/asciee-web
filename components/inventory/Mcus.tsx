@@ -62,9 +62,9 @@ export default function Mcus() {
 
   return (
     <section className="mt-4 bg-transparent px-6">
-      <h1 className="flex items-center justify-center text-xl md:text-4xl font-bold mb-4 text-white text-center">
-        Microcontrollers & Components
-      </h1>
+      <h1 className="text-2xl text-center md:text-4xl font-extrabold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 drop-shadow-sm">
+            Microcontrollers & Components
+          </h1>
 
       <div className="grid gap-4 place-items-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {mcus.map((mcu) => (

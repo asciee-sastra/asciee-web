@@ -5,7 +5,7 @@ const aboutSections = [
   {
     title: "Who are we?",
     content: `ASCIEE is a vibrant community driven by curiosity, innovation, and a passion for learning.
-It’s a place where knowledge meets creativity and ideas come alive — where like-minded engineers can connect, collaborate, and grow together.
+It’s a place where knowledge meets creativity and ideas come alive where like-minded engineers can connect, collaborate, and grow together.
 We empower students to experiment, and excel in the world of technology.`,
   },
   {

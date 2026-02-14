@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Navbar from "@/components/Main/Navbar";
+import Footer from "@/components/Main/Footer";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,6 +15,7 @@ type Project = {
   title: string;
   description: string;
   tags: string[];
+  status: boolean;
 };
 
 function Tag({ text }: { text: string }) {
@@ -27,17 +29,16 @@ function Tag({ text }: { text: string }) {
 function ProjectCard({ p }: { p: Project }) {
   return (
     <article className="glass-card overflow-hidden transition-transform transform hover:-translate-y-1">
-      <div className="p-4">
+      <div className="p-4 flex flex-col justify-around h-full">
         <h3 className="text-xl font-semibold text-white">{p.title}</h3>
         <p className="mt-3 text-md text-gray-300">{p.description}</p>
         {p.tags?.length > 0 && (
-          <div className="flex gap-2 mt-4 flex-wrap">
+          <div className="flex  gap-2 mt-6 flex-wrap">
             {p.tags.map((t, i) => (
               <Tag key={i} text={t} />
             ))}
           </div>
         )}
-        
       </div>
     </article>
   );
@@ -52,7 +53,7 @@ export default function AscieeProjectsGrid() {
     const fetchProjects = async () => {
       const { data, error } = await supabase
         .from("projects")
-        .select("id, title, description, tags")
+        .select("id, title, description, tags, status") // 👈 include status
         .order("id", { ascending: true });
 
       if (error) {
@@ -74,24 +75,46 @@ export default function AscieeProjectsGrid() {
     return <div className="text-center text-red-400 p-8">{errorMsg}</div>;
   }
 
+  // segregate based on status
+  const ongoing = projects.filter((p) => p.status === true);
+  const completed = projects.filter((p) => p.status === false);
+
   return (
     <>
-    <Navbar />
-    <section
-      id="projects"
-      className="p-8 mt-20"
-    >
-      <h2 className="text-3xl font-bold text-center text-white mb-6">Ongoing Projects</h2>
-      {projects.length === 0 ? (
-        <p className="text-gray-400">No projects available.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((p) => (
-            <ProjectCard key={p.id} p={p} />
-          ))}
-        </div>
-      )}
-    </section>
+      <Navbar />
+
+      {/* Ongoing Projects */}
+      <section id="projects" className="p-8 mt-20">
+        <h2 className="text-3xl font-bold text-center text-white mb-6">
+          Ongoing Projects
+        </h2>
+        {ongoing.length === 0 ? (
+          <p className="text-gray-400">No ongoing projects.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {ongoing.map((p) => (
+              <ProjectCard key={p.id} p={p} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Completed Projects */}
+      <section id="completed-projects" className="p-8 mt-12">
+        <h2 className="text-3xl font-bold text-center text-white mb-6">
+          Completed Projects
+        </h2>
+        {completed.length === 0 ? (
+          <p className="text-gray-400">No completed projects.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {completed.map((p) => (
+              <ProjectCard key={p.id} p={p} />
+            ))}
+          </div>
+        )}
+      </section>
+      <Footer />
     </>
   );
 }

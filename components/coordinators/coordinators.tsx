@@ -145,9 +145,9 @@ export default function CoordinatorsPage() {
   return (
     <section className="mt-24 mb-6 bg-transparent px-6">
       <div className="text-center mb-8">
-        <h1 className="text-3xl md:text-5xl font-bold text-white">
-          Coordinators
-        </h1>
+        <h1 className="text-4xl md:text-6xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 drop-shadow-sm">
+            Coordinators
+          </h1>
         <p className="mt-3 text-base md:text-lg text-gray-300">
           The ones who make it all possible
         </p>
@@ -163,7 +163,7 @@ export default function CoordinatorsPage() {
 
       {/* Heads Section */}
       <h1 className="flex items-center justify-center text-xl md:text-4xl font-bold mt-16 mb-8 text-white text-center">
-       Cluster Heads
+        Cluster Heads
       </h1>
       {renderGrid(heads, "heads")}
 
@@ -179,11 +179,10 @@ export default function CoordinatorsPage() {
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className={`flex items-center justify-center px-4 py-2 cursor-pointer rounded-full text-sm transition ${
-                activeTab === key
+              className={`flex items-center justify-center px-4 py-2 cursor-pointer rounded-full text-sm transition ${activeTab === key
                   ? "text-white bg-gradient-to-r from-[#720E9E] to-[#9D4EDD]"
                   : "text-white hover:bg-white/10"
-              }`}
+                }`}
             >
               {label}
             </button>

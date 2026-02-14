@@ -72,9 +72,9 @@ export default function Sensors() {
 
   return (
     <section className="mt-24 bg-transparent px-6">
-      <h1 className="flex items-center justify-center text-2xl md:text-4xl font-bold mb-4 text-white">
-        Sensors
-      </h1>
+      <h1 className="text-2xl text-center md:text-4xl font-extrabold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 drop-shadow-sm">
+            Sensors
+          </h1>
 
       <div className="grid gap-4 place-items-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {visibleSensors.map((sensor) => (

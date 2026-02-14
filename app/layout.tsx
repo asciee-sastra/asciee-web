@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#1a0020" />
@@ -39,8 +39,8 @@ export default function RootLayout({
       >
         {children}
         
-      </body>
-      <Footer />
+      </body> 
+      
     </html>
   );
 }

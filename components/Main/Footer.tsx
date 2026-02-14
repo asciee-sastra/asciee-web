@@ -96,7 +96,7 @@ const Footer = () => {
   <p className="text-gray-400 text-md">
     Designed and Developed by{" "}
     <Link
-      href="https://saifbuilds.vercel.app/"
+      href="https://saifullah.tech/"
       target="_blank"
       className="relative font-bold underline text-lg text-white"
     >
