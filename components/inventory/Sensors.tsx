@@ -71,7 +71,7 @@ export default function Sensors() {
   const visibleSensors = sensors.slice(0, visibleCount);
 
   return (
-    <section className="mt-24 bg-transparent px-6">
+    <section className="mt-24 bg-transparent px-24">
       <h1 className="text-2xl text-center md:text-4xl font-extrabold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 drop-shadow-sm">
             Sensors
           </h1>

@@ -31,12 +31,11 @@ export default function ICsList() {
     <div className="p-6">
       {/* Top Heading */}
       <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
-        <Microchip className="w-6 h-6 text-primary" />
-        ICs
+        
       </h1>
 
       {/* IC List */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-24">
         {ics.map((ic) => (
           <Card key={ic.id} className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-md">
             <CardHeader>

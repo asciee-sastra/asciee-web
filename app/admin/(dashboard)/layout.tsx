@@ -105,6 +105,15 @@ export default async function AdminLayout({
                                 <span className="ml-3">Coordinators</span>
                             </Link>
                         </li>
+                        <li>
+                            <Link
+                                href="/admin/settings"
+                                className="flex items-center rounded-lg p-2 text-gray-300 hover:bg-white/10 hover:text-white group"
+                            >
+                                <Settings className="h-5 w-5 text-gray-400 group-hover:text-white" />
+                                <span className="ml-3">Settings</span>
+                            </Link>
+                        </li>
                     </ul>
                     <div className="border-t border-gray-700 mt-auto pt-4">
                         <form action={handleSignOut}>

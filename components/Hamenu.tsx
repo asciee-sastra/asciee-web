@@ -30,7 +30,7 @@ const NAV_ITEMS = [
   { name: "Events", href: "/events", icon: Calendar },
 ]
 
-export default function Hamenu() {
+export default function Hamenu({ feedbackUrl }: { feedbackUrl: string }) {
   return (
     <Sheet>
       {/* Hamburger Button */}
@@ -76,11 +76,13 @@ export default function Hamenu() {
 
         {/* Feedback Button */}
         <div className="flex justify-center mb-4">
-          <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-800 
-                              hover:from-purple-700 hover:to-purple-900 
-                              transition-all rounded-full text-lg font-medium shadow-lg">
-            <MessagesSquare size={22} aria-hidden="true" /> Feedback
-          </button>
+          <Link href={feedbackUrl} target="_blank" className="w-full">
+            <button className="w-full flex justify-center items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-800 
+                                hover:from-purple-700 hover:to-purple-900 
+                                transition-all rounded-full text-lg font-medium shadow-lg">
+              <MessagesSquare size={22} aria-hidden="true" /> Feedback
+            </button>
+          </Link>
         </div>
       </SheetContent>
     </Sheet>

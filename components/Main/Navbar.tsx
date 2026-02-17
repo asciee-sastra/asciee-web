@@ -14,11 +14,13 @@ import {
 import Hamenu from "../Hamenu";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 const Navbar = () => {
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const pathname = usePathname();
+  const [feedbackUrl, setFeedbackUrl] = useState("");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,6 +36,23 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
+  useEffect(() => {
+    const fetchFeedbackUrl = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("links")
+        .select("link")
+        .eq("name", "feedback")
+        .maybeSingle();
+
+      if (data?.link) {
+        setFeedbackUrl(data.link);
+      }
+    };
+
+    fetchFeedbackUrl();
+  }, []);
+
   // nav items
   const navItems = [
     { name: "Home", href: "/", icon: Home },
@@ -45,9 +64,8 @@ const Navbar = () => {
 
   return (
     <header
-      className={`fixed top-2 left-0 w-full h-17 flex justify-center z-50 transition-transform duration-500 ${
-        visible ? "translate-y-0" : "-translate-y-24"
-      }`}
+      className={`fixed top-2 left-0 w-full h-17 flex justify-center z-50 transition-transform duration-500 ${visible ? "translate-y-0" : "-translate-y-24"
+        }`}
     >
       <nav
         className="w-[95%] max-w-6xl flex items-center justify-between 
@@ -77,11 +95,10 @@ const Navbar = () => {
           {navItems.map(({ name, href, icon: Icon }) => (
             <Link key={href} href={href}>
               <button
-                className={`flex items-center gap-2 px-4 py-2 cursor-pointer rounded-full text-sm transition ${
-                  pathname === href
-                    ? "text-white bg-gradient-to-r from-[#720E9E] to-[#9D4EDD] shadow-md shadow-[#720E9E]"
-                    : "text-white hover:bg-white/10"
-                }`}
+                className={`flex items-center gap-2 px-4 py-2 cursor-pointer rounded-full text-sm transition ${pathname === href
+                  ? "text-white bg-gradient-to-r from-[#720E9E] to-[#9D4EDD] shadow-md shadow-[#720E9E]"
+                  : "text-white hover:bg-white/10"
+                  }`}
               >
                 <Icon size={18} /> {name}
               </button>
@@ -92,13 +109,13 @@ const Navbar = () => {
         {/* Right Side */}
         <div className="flex items-center gap-3 z-10">
           {/* Feedback button desktop */}
-          <Link target="_blank" href="https://forms.gle/Q99Zs7uYMkRdBjGM6"><button className="hidden md:flex px-5 py-2 rounded-full bg-white text-black font-medium items-center gap-2 shadow-md hover:shadow-[0_0_12px_#720E9E] transition">
+          <Link target="_blank" href={feedbackUrl}><button className="hidden md:flex px-5 py-2 rounded-full bg-white text-black font-medium items-center gap-2 shadow-md hover:shadow-[0_0_12px_#720E9E] transition">
             <MessageSquare size={18} /> Feedback
           </button></Link>
 
           {/* Hamburger for mobile */}
           <div className="text-white md:hidden">
-            <Hamenu />
+            <Hamenu feedbackUrl={feedbackUrl} />
           </div>
         </div>
       </nav>
