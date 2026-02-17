@@ -59,7 +59,7 @@ export default function MiscComponents() {
   const visibleMisc = misc.slice(0, visibleCount);
 
   return (
-    <section className="mt-8 bg-transparent px-24">
+    <section className="mt-8 bg-transparent md:px-24">
       <h1 className="text-center text-2xl md:text-4xl font-bold mb-6 text-white">
         Miscellaneous Components
       </h1>
