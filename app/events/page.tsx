@@ -108,19 +108,19 @@ export default function EventsPage() {
   return (
     <>
       <Navbar />
-      <div className="w-full mt-24 max-w-7xl text-white mx-auto px-4 py-10">
+      <div className="w-full mt-24 max-w-7xl text-white mx-auto px-4">
         <UpgoingEvents />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mt-6 mb-10"
         >
           <h1 className="text-4xl md:text-6xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 drop-shadow-sm">
             Relive the Past Events
           </h1>
-          <p className="text-lg md:text-xl text-purple-200/80 max-w-2xl mx-auto">
+          <p className="text-md md:text-lg text-purple-200/80 max-w-2xl mx-auto">
             A journey through our milestones, achievements, and memorable moments.
           </p>
         </motion.div>
@@ -165,8 +165,10 @@ export default function EventsPage() {
                   className={`-right-5 hidden md:flex lg:-right-12 w-12 h-12 ${carouselButtonClasses}`}
                 />
               </Carousel>
+              <p className="text-center text-purple-200/60 mt-4">swipe left or right to see more events</p>
             </motion.div>
           ))}
+          
       </div>
       <Footer />
     </>

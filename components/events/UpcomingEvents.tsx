@@ -72,7 +72,7 @@ export default function UpcomingEvents() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="mb-12 text-center"
+                className="mb-8 text-center"
             >
                 <h1 className="text-4xl md:text-5xl pb-2 font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 drop-shadow-sm">
                     Upcoming Events
@@ -191,7 +191,6 @@ function EventCard({ name, description, path, date, time, link, index }: Upcomin
             </div>
 
             {/* Hover Glow Effect */}
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-purple-500/5 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
         </motion.div>
     );
 }
