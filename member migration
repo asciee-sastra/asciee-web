@@ -1,0 +1,329 @@
+// ============================================================
+// ASCI CLUB — YEAR MIGRATION SCRIPT
+// Usage: Update CONFIG below, paste in browser console, run.
+// ============================================================
+
+const CONFIG = {
+  SUPABASE_URL: "https://coawdllepnzlpvnmewrp.supabase.co",
+  ANON_KEY: "YOUR_ANON_KEY_HERE",
+  BEARER: "YOUR_FRESH_BEARER_TOKEN_HERE",
+
+  // Table migration order: each entry moves FROM → TO
+  TABLE_MIGRATIONS: [
+    { from: "thirdyr", to: "fourthyr" },
+    { from: "secondyr", to: "thirdyr" },
+  ],
+
+  // Storage bucket migrations (same order as tables)
+  BUCKET_MIGRATIONS: [
+    { from: "thirdyr", to: "fourthyr" },
+    { from: "secondyr", to: "thirdyr" },
+  ],
+};
+
+// ============================================================
+// CORE HELPERS
+// ============================================================
+
+const h = () => ({
+  "apikey": CONFIG.ANON_KEY,
+  "Authorization": `Bearer ${CONFIG.BEARER}`,
+  "Content-Type": "application/json",
+  "Prefer": "return=minimal",
+});
+
+const log = (msg) => console.log(msg);
+const err = (msg) => console.error("❌ ERROR:", msg);
+
+async function apiFetch(path, options = {}) {
+  const res = await fetch(`${CONFIG.SUPABASE_URL}${path}`, {
+    headers: h(),
+    ...options,
+  });
+  return res;
+}
+
+async function getRows(table) {
+  const res = await apiFetch(`/rest/v1/${table}?select=*`);
+  const data = await res.json();
+  if (!Array.isArray(data)) throw new Error(`Failed to fetch ${table}: ${JSON.stringify(data)}`);
+  return data;
+}
+
+async function insertRows(table, rows) {
+  if (rows.length === 0) { log(`⚠️ No rows to insert into ${table}`); return true; }
+  const clean = rows.map(({ id, ...rest }) => rest); // strip old IDs
+  const res = await apiFetch(`/rest/v1/${table}`, {
+    method: "POST",
+    headers: { ...h(), "Prefer": "resolution=merge-duplicates" },
+    body: JSON.stringify(clean),
+  });
+  return res.status === 201 || res.status === 200 || res.status === 204;
+}
+
+async function deleteRowsById(table, ids) {
+  if (ids.length === 0) { log(`⚠️ No IDs to delete from ${table}`); return true; }
+  // Delete one by one using actual IDs — avoids silent filter failures
+  let allOk = true;
+  for (const id of ids) {
+    const res = await apiFetch(`/rest/v1/${table}?id=eq.${id}`, { method: "DELETE" });
+    if (res.status !== 204) {
+      err(`Delete failed for id=${id} in ${table}, status=${res.status}`);
+      allOk = false;
+    }
+  }
+  return allOk;
+}
+
+async function listBucketFiles(bucket) {
+  const res = await apiFetch(`/storage/v1/object/list/${bucket}`, {
+    method: "POST",
+    body: JSON.stringify({ limit: 200, offset: 0, prefix: "" }),
+  });
+  const data = await res.json();
+  if (!Array.isArray(data)) {
+    log(`⚠️ Bucket '${bucket}' not found or empty: ${JSON.stringify(data)}`);
+    return [];
+  }
+  return data;
+}
+
+async function copyFile(fromBucket, toBucket, fileName) {
+  // Download
+  const dlRes = await fetch(
+    `${CONFIG.SUPABASE_URL}/storage/v1/object/public/${fromBucket}/${encodeURIComponent(fileName)}`,
+    { headers: h() }
+  );
+  if (!dlRes.ok) {
+    err(`Download failed: ${fileName} from ${fromBucket} (${dlRes.status})`);
+    return false;
+  }
+  const blob = await dlRes.blob();
+
+  // Upload
+  const ulRes = await fetch(
+    `${CONFIG.SUPABASE_URL}/storage/v1/object/${toBucket}/${encodeURIComponent(fileName)}`,
+    {
+      method: "POST",
+      headers: {
+        "apikey": CONFIG.ANON_KEY,
+        "Authorization": `Bearer ${CONFIG.BEARER}`,
+        "Content-Type": blob.type || "image/jpeg",
+        "x-upsert": "true",
+      },
+      body: blob,
+    }
+  );
+  if (!ulRes.ok) {
+    const e = await ulRes.json();
+    err(`Upload failed: ${fileName} to ${toBucket} — ${JSON.stringify(e)}`);
+    return false;
+  }
+  return true;
+}
+
+function downloadBackup(data) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `asci_backup_${Date.now()}.json`;
+  a.click();
+  log("💾 Backup downloaded!");
+}
+
+// ============================================================
+// PHASE 1 — PRE-FLIGHT AUDIT
+// ============================================================
+
+async function preflight() {
+  log("\n🔍 PHASE 1: PRE-FLIGHT AUDIT");
+  log("─────────────────────────────");
+
+  // Check token freshness
+  try {
+    const payload = JSON.parse(atob(CONFIG.BEARER.split(".")[1]));
+    const expiresIn = payload.exp - Math.floor(Date.now() / 1000);
+    if (expiresIn < 300) throw new Error(`Bearer token expires in ${expiresIn}s — refresh it first!`);
+    log(`✅ Bearer token valid for ${Math.floor(expiresIn / 60)} minutes`);
+  } catch (e) {
+    throw new Error("Bearer token invalid or expired: " + e.message);
+  }
+
+  // Check buckets
+  const bucketsRes = await apiFetch("/storage/v1/bucket");
+  const buckets = await bucketsRes.json();
+  const bucketNames = Array.isArray(buckets) ? buckets.map(b => b.name) : [];
+  log(`✅ Storage buckets found: [${bucketNames.join(", ") || "none"}]`);
+
+  // Warn about missing destination buckets
+  for (const m of CONFIG.BUCKET_MIGRATIONS) {
+    if (!bucketNames.includes(m.to)) {
+      log(`⚠️ Destination bucket '${m.to}' does not exist — will attempt to create via upload`);
+    }
+  }
+
+  // Fetch and display current table state
+  const state = {};
+  for (const m of CONFIG.TABLE_MIGRATIONS) {
+    const fromRows = await getRows(m.from);
+    const toRows = await getRows(m.to);
+    state[m.from] = fromRows;
+    state[m.to] = toRows;
+    log(`📋 ${m.from}: ${fromRows.length} rows | ${m.to}: ${toRows.length} rows`);
+  }
+
+  // Fetch bucket file counts
+  const bucketState = {};
+  for (const m of CONFIG.BUCKET_MIGRATIONS) {
+    const fromFiles = await listBucketFiles(m.from);
+    const toFiles = await listBucketFiles(m.to);
+    bucketState[m.from] = fromFiles;
+    bucketState[m.to] = toFiles;
+    log(`🗂️ bucket '${m.from}': ${fromFiles.length} files | bucket '${m.to}': ${toFiles.length} files`);
+  }
+
+  log("\n📊 EXPECTED AFTER MIGRATION:");
+  for (const m of CONFIG.TABLE_MIGRATIONS) {
+    log(`  ${m.to} table → ${state[m.from].length} rows (from ${m.from})`);
+    log(`  ${m.from} table → 0 rows (cleared)`);
+  }
+
+  return { state, bucketState };
+}
+
+// ============================================================
+// PHASE 2 — BACKUP
+// ============================================================
+
+async function backup(state) {
+  log("\n💾 PHASE 2: BACKUP");
+  log("─────────────────────────────");
+  downloadBackup(state);
+  log("✅ Backup complete — check your Downloads folder before continuing");
+}
+
+// ============================================================
+// PHASE 3 — COPY STORAGE FILES
+// ============================================================
+
+async function migrateStorage(bucketState) {
+  log("\n📁 PHASE 3: COPYING STORAGE FILES");
+  log("─────────────────────────────");
+
+  for (const m of CONFIG.BUCKET_MIGRATIONS) {
+    const files = bucketState[m.from] || [];
+    log(`\nCopying ${files.length} files: '${m.from}' → '${m.to}'`);
+
+    let copied = 0, failed = 0;
+    for (const file of files) {
+      const ok = await copyFile(m.from, m.to, file.name);
+      if (ok) { copied++; log(`  ✅ ${file.name}`); }
+      else { failed++; }
+    }
+
+    log(`📊 ${m.from} → ${m.to}: ${copied} copied, ${failed} failed`);
+    if (failed > 0) throw new Error(`Storage copy failed for bucket '${m.from}' → '${m.to}'. Fix errors before proceeding.`);
+  }
+
+  log("✅ All storage files copied successfully");
+}
+
+// ============================================================
+// PHASE 4 — MIGRATE TABLE ROWS
+// ============================================================
+
+async function migrateRows(state) {
+  log("\n📋 PHASE 4: MIGRATING TABLE ROWS");
+  log("─────────────────────────────");
+
+  for (const m of CONFIG.TABLE_MIGRATIONS) {
+    const sourceRows = state[m.from];
+    log(`\nMigrating ${sourceRows.length} rows: '${m.from}' → '${m.to}'`);
+
+    // Insert into destination
+    const insertOk = await insertRows(m.to, sourceRows);
+    if (!insertOk) throw new Error(`Insert into '${m.to}' failed`);
+
+    // Verify insert count
+    const destRows = await getRows(m.to);
+    const expectedCount = (state[m.to]?.length || 0) + sourceRows.length;
+    if (destRows.length < sourceRows.length) {
+      throw new Error(`Insert verification failed: ${m.to} has ${destRows.length} rows, expected at least ${sourceRows.length}`);
+    }
+    log(`✅ Insert verified: '${m.to}' now has ${destRows.length} rows`);
+
+    // Delete source rows using actual IDs
+    const sourceIds = sourceRows.map(r => r.id);
+    log(`🗑️ Deleting ${sourceIds.length} rows from '${m.from}'...`);
+    const deleteOk = await deleteRowsById(m.from, sourceIds);
+    if (!deleteOk) throw new Error(`Some deletes failed in '${m.from}' — check manually`);
+
+    // Verify deletion
+    const remaining = await getRows(m.from);
+    const oldIds = new Set(sourceIds.map(String));
+    const notDeleted = remaining.filter(r => oldIds.has(String(r.id)));
+    if (notDeleted.length > 0) {
+      err(`${notDeleted.length} rows NOT deleted from '${m.from}': ${notDeleted.map(r => r.name).join(", ")}`);
+      throw new Error("Deletion verification failed");
+    }
+    log(`✅ Delete verified: '${m.from}' source rows cleared (${remaining.length} remaining)`);
+  }
+}
+
+// ============================================================
+// PHASE 5 — FINAL VERIFICATION
+// ============================================================
+
+async function verify() {
+  log("\n✅ PHASE 5: FINAL VERIFICATION");
+  log("─────────────────────────────");
+
+  let allGood = true;
+  for (const m of CONFIG.TABLE_MIGRATIONS) {
+    const rows = await getRows(m.to);
+    log(`📋 ${m.to}: ${rows.length} rows — ${rows.map(r => r.name).join(", ")}`);
+
+    const files = await listBucketFiles(m.to);
+    log(`🗂️ bucket '${m.to}': ${files.length} files`);
+
+    const srcRows = await getRows(m.from);
+    if (srcRows.length > 0) {
+      err(`'${m.from}' still has ${srcRows.length} rows not deleted!`);
+      allGood = false;
+    } else {
+      log(`✅ '${m.from}' table is empty`);
+    }
+  }
+
+  if (allGood) {
+    log("\n🎉 MIGRATION COMPLETE — All tables and buckets verified successfully!");
+    log("👉 Refresh your website to confirm photos and members display correctly.");
+  } else {
+    err("Migration finished with warnings — review errors above.");
+  }
+}
+
+// ============================================================
+// MAIN — RUN ALL PHASES
+// ============================================================
+
+async function main() {
+  console.clear();
+  log("🚀 ASCI CLUB YEAR MIGRATION SCRIPT");
+  log("=====================================\n");
+
+  try {
+    const { state, bucketState } = await preflight();
+    await backup(state);
+    await migrateStorage(bucketState);
+    await migrateRows(state);
+    await verify();
+  } catch (e) {
+    err(`MIGRATION STOPPED: ${e.message}`);
+    log("⚠️ Script halted safely. No further changes will be made.");
+    log("⚠️ Check the error above, fix it, and re-run.");
+  }
+}
+
+main();
