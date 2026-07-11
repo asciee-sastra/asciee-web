@@ -3,12 +3,22 @@ import React from "react";
 import Link from "next/link";
 import logo from "@/public/asciee.jpg";
 import { Tilt } from "../motion-primitives/tilt";
-import { Button } from "../ui/button";
 import { Boxes, Calendar } from "lucide-react";
 
 const Hero = () => {
   return (
-    <section className="w-full bg-[url('/comp-mob.png')] md:bg-[url('/comp-bg.png')] bg-no-repeat bg-contain bg-center  min-h-screen flex flex-col justify-center items-center text-center px-6 relative">
+    <section className="w-full bg-[url('/comp-mob.png')] md:bg-[url('/comp-bg.png')] bg-no-repeat bg-contain bg-center min-h-screen flex flex-col justify-center items-center text-center px-6 relative">
+      
+      {/* Orientation Banner */}
+      
+        href="https://docs.google.com/forms/d/e/1FAIpQLScTGJmwAstfJVomUN_0y13vcsy9xKu-ZtxWmAbxwjdwiiRnqQ/viewform?pli=1"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mb-4 px-5 py-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm text-white text-sm md:text-base hover:bg-white/20 hover:scale-105 transition-all duration-300 animate-pulse"
+      >
+        🎓 ASCIEE Recruitments are live — click here to register →
+      </a>
+
       {/* Logo with tilt effect */}
       <Tilt rotationFactor={24} isRevese>
         <Image
@@ -39,15 +49,14 @@ const Hero = () => {
             <Calendar className="h-5 w-5" /> Upcoming Events
           </button>
         </Link>
-
         <Link href="/inventory">
-          <button className="flex items-center gap-2 mx-auto glass-card text-md text-white rounded-3xl px-8 py-2 border  hover:scale-105 hover:bg-white/20 hover:text-white transition-all">
+          <button className="flex items-center gap-2 mx-auto glass-card text-md text-white rounded-3xl px-8 py-2 border hover:scale-105 hover:bg-white/20 hover:text-white transition-all">
             <Boxes className="h-6 w-6" /> Inventory
           </button>
         </Link>
       </div>
+
     </section>
   );
 };
-
 export default Hero;
