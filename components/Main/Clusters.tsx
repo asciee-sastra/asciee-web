@@ -14,7 +14,7 @@ const teams = [
  // { id: 3, image: content, title: "Content Team" },
   //{ id: 4, image: ind_re, title: "Industrial Relation" },
   { id: 3, image: tec_afr, title: "Technical Affairs" },
-  {id: 4,image: ext,tittle: "External Relation & Colabration" },
+  {id: 4,image: ext,title: "External Relation & Colabration" },
 ];
 
 export default function Clusters() {
