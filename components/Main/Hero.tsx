@@ -11,11 +11,7 @@ const Hero = () => {
       
       {/* Orientation Banner */}
       
-        href="https://docs.google.com/forms/d/e/1FAIpQLScTGJmwAstfJVomUN_0y13vcsy9xKu-ZtxWmAbxwjdwiiRnqQ/viewform?pli=1"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mb-4 px-5 py-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm text-white text-sm md:text-base hover:bg-white/20 hover:scale-105 transition-all duration-300 animate-pulse"
-      >
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScTGJmwAstfJVomUN_0y13vcsy9xKu-ZtxWmAbxwjdwiiRnqQ/viewform?pli=1" target="_blank" rel="noopener noreferrer" className="mb-4 px-5 py-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm text-white text-sm md:text-base hover:bg-white/20 hover:scale-105 transition-all duration-300 animate-pulse">
         🎓 ASCIEE Recruitments are live — click here to register →
       </a>
 
