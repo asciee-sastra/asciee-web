@@ -7,7 +7,7 @@ import cre_media from "@/public/creative_media.jpg";
 //import content from "@/public/content.jpg";
 //import ind_re from "@/public/industrial_relation.jpg";
 import tec_afr from  "@/public/Technical_affairs.jpg";
-import ext from "@public/External_Relation_colabration.jpg"
+import ext from "@/public/External_Relation_colabration.jpg"
 const teams = [
   { id: 1, image: op_adm, title: "Operation&Admin" },
   { id: 2, image: cre_media, title: "Creative Media/Design Team" },
