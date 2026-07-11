@@ -4,16 +4,17 @@ import React from "react";
 import Image from "next/image";
 import op_adm from "@/public/operation_admin.jpg";
 import cre_media from "@/public/creative_media.jpg";
-import content from "@/public/content.jpg";
-import ind_re from "@/public/industrial_relation.jpg";
+//import content from "@/public/content.jpg";
+//import ind_re from "@/public/industrial_relation.jpg";
 import tec_afr from  "@/public/Technical_affairs.jpg";
-
+import ext from "@public/External_Relation_colabration.jpg"
 const teams = [
   { id: 1, image: op_adm, title: "Operation&Admin" },
   { id: 2, image: cre_media, title: "Creative Media/Design Team" },
-  { id: 3, image: content, title: "Content Team" },
-  { id: 4, image: ind_re, title: "Industrial Relation" },
-  { id: 5, image: tec_afr, title: "Technical Affairs" },
+ // { id: 3, image: content, title: "Content Team" },
+  //{ id: 4, image: ind_re, title: "Industrial Relation" },
+  { id: 3, image: tec_afr, title: "Technical Affairs" },
+  {id: 4,image: ext,tittle: "External Relation & Colabration" },
 ];
 
 export default function Clusters() {
