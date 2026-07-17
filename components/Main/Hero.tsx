@@ -5,16 +5,24 @@ import logo from "@/public/asciee.jpg";
 import { Tilt } from "../motion-primitives/tilt";
 import { Boxes, Calendar } from "lucide-react";
 
+// ✏️ EDIT ONLY THESE TWO LINES WHEN RECRUITMENT CHANGES
+const RECRUITMENT_OPEN = true;
+const FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScTGJmwAstfJVomUN_0y13vcsy9xKu-ZtxWmAbxwjdwiiRnqQ/viewform?pli=1";
+
 const Hero = () => {
-   const RECRUITMENT_OPEN = false;
   return (
     <section className="w-full bg-[url('/comp-mob.png')] md:bg-[url('/comp-bg.png')] bg-no-repeat bg-contain bg-center min-h-screen flex flex-col justify-center items-center text-center px-6 relative">
-      
-      {/* Orientation Banner */}
-     
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLScTGJmwAstfJVomUN_0y13vcsy9xKu-ZtxWmAbxwjdwiiRnqQ/viewform?pli=1" target="_blank" rel="noopener noreferrer" className="mb-4 px-5 py-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm text-white text-sm md:text-base hover:bg-white/20 hover:scale-105 transition-all duration-300 animate-pulse">
-        🎓 ASCIEE Recruitments are live — click here to register →
-      </a>
+
+      {/* Recruitment Banner */}
+      {RECRUITMENT_OPEN ? (
+        <a href={FORM_LINK} target="_blank" rel="noopener noreferrer" className="mb-6 px-5 py-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm text-white text-sm md:text-base hover:bg-white/20 hover:scale-105 transition-all duration-300 animate-pulse">
+          🎓 ASCIEE Recruitments are live — click here to register →
+        </a>
+      ) : (
+        <div className="mb-6 px-5 py-2 rounded-full border border-white/20 bg-white/5 text-white/50 text-sm md:text-base">
+          🔒 Recruitments are currently closed
+        </div>
+      )}
 
       {/* Logo with tilt effect */}
       <Tilt rotationFactor={24} isRevese>
