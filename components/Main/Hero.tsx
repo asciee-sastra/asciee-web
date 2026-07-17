@@ -6,7 +6,7 @@ import { Tilt } from "../motion-primitives/tilt";
 import { Boxes, Calendar } from "lucide-react";
 
 // ✏️ EDIT ONLY THESE TWO LINES WHEN RECRUITMENT CHANGES
-const RECRUITMENT_OPEN = true;
+const RECRUITMENT_OPEN = false;
 const FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScTGJmwAstfJVomUN_0y13vcsy9xKu-ZtxWmAbxwjdwiiRnqQ/viewform?pli=1";
 
 const Hero = () => {
