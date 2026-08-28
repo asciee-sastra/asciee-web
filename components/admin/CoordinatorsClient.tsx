@@ -277,16 +277,44 @@ export default function CoordinatorsClient({ data: initialData }: { data: Record
                                     onChange={(e) => setCurrentItem({ ...currentItem, name: e.target.value })}
                                 />
                             </div>
+<div>
+    <label className="block text-sm font-medium text-gray-300 mb-1">
+        Role
+    </label>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">Role</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2 text-white focus:border-purple-500 focus:outline-none placeholder-gray-500"
-                                    value={currentItem.role || ""}
-                                    onChange={(e) => setCurrentItem({ ...currentItem, role: e.target.value })}
-                                />
+    <div className="flex w-full rounded-lg bg-white/5 border border-white/10 overflow-hidden focus-within:border-purple-500">
+
+        {/* Fixed category */}
+        <div className="flex items-center px-3 text-gray-400 whitespace-nowrap bg-white/5">
+            {(currentItem.role || currentConfig.rolePrefix || "")
+                .split(" - ")[0]} -
+        </div>
+
+        {/* Editable position */}
+        <input
+            type="text"
+            required
+            className="flex-1 bg-transparent px-3 py-2 text-white focus:outline-none placeholder-gray-500"
+            placeholder="Enter position"
+            value={
+                (currentItem.role || "")
+                    .split(" - ")
+                    .slice(1)
+                    .join(" - ")
+            }
+            onChange={(e) => {
+                const category =
+                    (currentItem.role || currentConfig.rolePrefix || "")
+                        .split(" - ")[0];
+
+                setCurrentItem({
+                    ...currentItem,
+                    role: category + " - " + e.target.value
+                });
+            }}
+        />
+    </div>
+</div>
                             </div>
 
                             <div>
