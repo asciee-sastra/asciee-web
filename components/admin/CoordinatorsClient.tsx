@@ -15,17 +15,64 @@ import { useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Coordinator = {
-    id: string; // id is string in coordinators.tsx
+    id: string;
     name: string;
     role: string;
     path?: string;
 };
 
-const GROUPS = {
+type GroupConfig = {
+    label: string;
+    bucket: string;
+    table: string;
+    // Optional: only show rows whose role passes this check.
+    // Used so multiple tabs can share the same underlying table (heads).
+    filter?: (role: string) => boolean;
+    // Optional: prefix auto-filled into the Role field when adding a new
+    // member from this tab, so admins don't have to retype it every time.
+    rolePrefix?: string;
+};
+
+const GROUPS: Record<string, GroupConfig> = {
     presidents: { label: "Presidents", bucket: "fourthyr", table: "presidents" },
     secretaries: { label: "Secretaries", bucket: "thirdyr", table: "secretaries" },
     jointsec: { label: "Joint Sec", bucket: "secondyr", table: "jointsec" },
-    heads: { label: "Cluster Heads", bucket: "thirdyr", table: "heads" },
+
+    // Original cluster heads (Design / Content writing / Outreach / Inventory).
+    // Excludes rows that belong to the three new sub-clusters below.
+    heads: {
+        label: "Cluster Heads",
+        bucket: "thirdyr",
+        table: "heads",
+        filter: (role) =>
+            !role.startsWith("Technical Affairs") &&
+            !role.startsWith("Operations & Admin") &&
+            !role.startsWith("External Relations"),
+    },
+
+    // New sub-clusters — same table, filtered by role prefix.
+    technicalaffairs: {
+        label: "Technical Affairs",
+        bucket: "thirdyr",
+        table: "heads",
+        filter: (role) => role.startsWith("Technical Affairs"),
+        rolePrefix: "Technical Affairs - ",
+    },
+    opsadmin: {
+        label: "Operations & Admin",
+        bucket: "thirdyr",
+        table: "heads",
+        filter: (role) => role.startsWith("Operations & Admin"),
+        rolePrefix: "Operations & Admin - ",
+    },
+    externalrelations: {
+        label: "External Relations",
+        bucket: "thirdyr",
+        table: "heads",
+        filter: (role) => role.startsWith("External Relations"),
+        rolePrefix: "External Relations - ",
+    },
+
     fourthyr: { label: "4th Year", bucket: "fourthyr", table: "fourthyr" },
     thirdyr: { label: "3rd Year", bucket: "thirdyr", table: "thirdyr" },
     secondyr: { label: "2nd Year", bucket: "secondyr", table: "secondyr" },
@@ -43,8 +90,14 @@ export default function CoordinatorsClient({ data: initialData }: { data: Record
 
     const currentConfig = GROUPS[activeTab];
 
+    // Rows for the active tab: pulled from the shared table, then filtered
+    // down to just this tab's slice (identity filter when none is set).
+    const visibleRows = (data[currentConfig.table] || []).filter((item) =>
+        currentConfig.filter ? currentConfig.filter(item.role) : true
+    );
+
     const handleOpenCreate = () => {
-        setCurrentItem({});
+        setCurrentItem({ role: currentConfig.rolePrefix || "" });
         setImageFile(null);
         setDialogOpen(true);
     };
@@ -55,15 +108,23 @@ export default function CoordinatorsClient({ data: initialData }: { data: Record
         setDialogOpen(true);
     };
 
+    const refreshTable = async () => {
+        const { data: newData } = await supabase
+            .from(currentConfig.table)
+            .select("*")
+            .order("id", { ascending: true });
+        if (newData) setData((prev) => ({ ...prev, [currentConfig.table]: newData }));
+    };
+
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure?")) return;
         setLoading(true);
         const { error } = await supabase.from(currentConfig.table).delete().eq("id", id);
         if (!error) {
-            setData({
-                ...data,
-                [activeTab]: data[activeTab].filter((i) => i.id !== id),
-            });
+            setData((prev) => ({
+                ...prev,
+                [currentConfig.table]: (prev[currentConfig.table] || []).filter((i) => i.id !== id),
+            }));
             router.refresh();
         } else {
             alert(error.message);
@@ -80,12 +141,12 @@ export default function CoordinatorsClient({ data: initialData }: { data: Record
 
             if (imageFile) {
                 const fileName = `${Date.now()}-${imageFile.name}`;
-                const { data: uploadData, error: uploadError } = await supabase.storage
+                const { error: uploadError } = await supabase.storage
                     .from(currentConfig.bucket)
                     .upload(fileName, imageFile);
 
                 if (uploadError) throw uploadError;
-                path = fileName; // We store just filename usually based on code exploration
+                path = fileName;
             }
 
             const itemData: any = {
@@ -104,9 +165,7 @@ export default function CoordinatorsClient({ data: initialData }: { data: Record
 
             setDialogOpen(false);
             router.refresh();
-            // Reload current tab data
-            const { data: newData } = await supabase.from(currentConfig.table).select("*").order("id", { ascending: true });
-            if (newData) setData({ ...data, [activeTab]: newData });
+            await refreshTable();
 
         } catch (error: any) {
             alert("Error: " + error.message);
@@ -155,7 +214,7 @@ export default function CoordinatorsClient({ data: initialData }: { data: Record
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/10">
-                            {data[activeTab]?.map((item) => (
+                            {visibleRows.map((item) => (
                                 <tr key={item.id} className="hover:bg-white/5 transition-colors">
                                     <td className="px-6 py-4 font-medium text-white flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-full overflow-hidden relative border border-white/10 bg-gray-800 flex items-center justify-center">
@@ -184,7 +243,7 @@ export default function CoordinatorsClient({ data: initialData }: { data: Record
                                     </td>
                                 </tr>
                             ))}
-                            {(!data[activeTab] || data[activeTab].length === 0) && (
+                            {visibleRows.length === 0 && (
                                 <tr>
                                     <td colSpan={3} className="px-6 py-8 text-center text-gray-400">No members found.</td>
                                 </tr>
