@@ -49,6 +49,8 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
     const [formEvent, setFormEvent] = useState<UpcomingEvent | null>(null);
     const [formFields, setFormFields] = useState<FormField[]>([]);
     const [formLoading, setFormLoading] = useState(false);
+    const [formIsOpen, setFormIsOpen] = useState(true);
+    const [formCloseAt, setFormCloseAt] = useState<string>("");
 
     const [regEvent, setRegEvent] = useState<UpcomingEvent | null>(null);
     const [regRows, setRegRows] = useState<any[]>([]);
@@ -145,6 +147,8 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
             .eq("event_id", event.id)
             .maybeSingle();
         setFormFields(data?.fields || []);
+        setFormIsOpen(data?.is_open ?? true);
+        setFormCloseAt(data?.close_at ? new Date(data.close_at).toISOString().slice(0, 16) : "");
         setFormLoading(false);
     };
 
@@ -165,6 +169,13 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
         if (!formEvent) return;
         setFormLoading(true);
 
+        const payload = {
+            fields: formFields,
+            is_open: formIsOpen,
+            close_at: formCloseAt ? new Date(formCloseAt).toISOString() : null,
+            updated_at: new Date().toISOString(),
+        };
+
         const { data: existing } = await supabase
             .from("event_forms")
             .select("id")
@@ -174,13 +185,13 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
         if (existing) {
             const { error } = await supabase
                 .from("event_forms")
-                .update({ fields: formFields, updated_at: new Date().toISOString() })
+                .update(payload)
                 .eq("id", existing.id);
             if (error) { alert(error.message); setFormLoading(false); return; }
         } else {
             const { error } = await supabase
                 .from("event_forms")
-                .insert([{ event_id: formEvent.id, fields: formFields }]);
+                .insert([{ event_id: formEvent.id, ...payload }]);
             if (error) { alert(error.message); setFormLoading(false); return; }
         }
 
@@ -558,6 +569,33 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
                             {formFields.length === 0 && (
                                 <p className="text-sm text-gray-500">No fields yet — click "Add Field" to build this event's registration form.</p>
                             )}
+
+                            {/* Open/Close controls */}
+                            <div className="rounded-lg border border-white/10 bg-white/5 p-4 space-y-3">
+                                <label className="flex items-center gap-2 text-sm text-white">
+                                    <input
+                                        type="checkbox"
+                                        checked={formIsOpen}
+                                        onChange={(e) => setFormIsOpen(e.target.checked)}
+                                    />
+                                    Registration is currently open (uncheck to close manually)
+                                </label>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        Auto-close at (optional)
+                                    </label>
+                                    <input
+                                        type="datetime-local"
+                                        className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2 text-white [color-scheme:dark]"
+                                        value={formCloseAt}
+                                        onChange={(e) => setFormCloseAt(e.target.value)}
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Leave blank to keep it open until you close it manually.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="flex justify-between items-center pt-4 mt-4 border-t border-white/10">
