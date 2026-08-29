@@ -172,15 +172,14 @@ export default function CoordinatorsPage() {
 
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-2/3 bg-gradient-to-r from-black/70 via-black/40 to-black/70 backdrop-blur-lg border border-white/10 text-white px-5 py-2 rounded-full shadow-lg flex flex-col items-center">
               <h3 className="text-sm font-semibold">{member.name}</h3>
-              <p className="text-xs text-gray-200">{member.role}</p>
+              <p className="text-xs text-gray-200">{formatRole(member.role)}</p>
             </div>
           </div>
         </Tilt>
       ))}
       {members.length === 0 && (
-       <p className="text-xs text-gray-200">{formatRole(member.role)}</p>
-      )}
-    </div>
+  <p className="text-center text-gray-400 py-10">No members found.</p>
+)}
   );
 
   const activeHeadsFilter = headsTabs.find((t) => t.key === activeHeadsTab)!.filter;
