@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { motion } from "framer-motion";
-import { Calendar, Clock, ExternalLink, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Calendar, Clock, ExternalLink, Loader2, X, ClipboardEdit } from "lucide-react";
 
 export interface UpcomingEvent {
-    id: number;
+    id: string;
     name: string;
     description: string;
     path: string;
@@ -15,10 +15,21 @@ export interface UpcomingEvent {
     link: string;
 }
 
+type FieldType = "text" | "email" | "number" | "textarea" | "select" | "checkbox" | "phone";
+type FormField = {
+    id: string;
+    label: string;
+    type: FieldType;
+    required: boolean;
+    options?: string[];
+};
+
 export default function UpcomingEvents() {
     const [events, setEvents] = useState<UpcomingEvent[]>([]);
+    const [formEventIds, setFormEventIds] = useState<Set<string>>(new Set()); // events that have a custom form
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [registerEvent, setRegisterEvent] = useState<UpcomingEvent | null>(null); // modal state
     const supabase = createClient();
 
     useEffect(() => {
@@ -27,14 +38,21 @@ export default function UpcomingEvents() {
                 const { data, error } = await supabase
                     .from("upcomingevents")
                     .select("*")
-                    .order('date', { ascending: true }); // sort by upcoming date
+                    .order('date', { ascending: true });
 
-                if (error) {
-                    throw error;
-                }
+                if (error) throw error;
+                if (data) setEvents(data as UpcomingEvent[]);
 
-                if (data) {
-                    setEvents(data as UpcomingEvent[]);
+                // Find which events have a non-empty custom form
+                const { data: forms } = await supabase
+                    .from("event_forms")
+                    .select("event_id, fields");
+                if (forms) {
+                    const ids = new Set(
+                        forms.filter((f: any) => Array.isArray(f.fields) && f.fields.length > 0)
+                             .map((f: any) => f.event_id)
+                    );
+                    setFormEventIds(ids);
                 }
             } catch (err: any) {
                 console.error("Error fetching upcoming events:", err);
@@ -56,15 +74,12 @@ export default function UpcomingEvents() {
     }
 
     if (error) {
-        // Silently fail or minimal error? User didn't specify. Minimal error is good for debugging.
         return (
             <div className="text-red-400 text-center py-10">
                 Error loading upcoming events.
             </div>
         )
     }
-
-
 
     return (
         <section className="w-full max-w-7xl mx-auto px-4 py-6 relative z-10">
@@ -88,8 +103,10 @@ export default function UpcomingEvents() {
                     {events.map((event, index) => (
                         <EventCard
                             key={event.id || index}
-                            {...event}
+                            event={event}
                             index={index}
+                            hasCustomForm={formEventIds.has(event.id)}
+                            onRegisterClick={() => setRegisterEvent(event)}
                         />
                     ))}
                 </div>
@@ -108,18 +125,45 @@ export default function UpcomingEvents() {
                     </p>
                 </motion.div>
             )}
+
+            {/* Registration Modal */}
+            <AnimatePresence>
+                {registerEvent && (
+                    <RegistrationModal
+                        event={registerEvent}
+                        onClose={() => setRegisterEvent(null)}
+                    />
+                )}
+            </AnimatePresence>
         </section>
     );
 }
 
-function EventCard({ name, description, path, date, time, link, index }: UpcomingEvent & { index: number }) {
-    // Helper to determine image source
+function EventCard({
+    event,
+    index,
+    hasCustomForm,
+    onRegisterClick,
+}: {
+    event: UpcomingEvent;
+    index: number;
+    hasCustomForm: boolean;
+    onRegisterClick: () => void;
+}) {
+    const { name, description, path, date, time, link } = event;
+
     const getImageUrl = (path: string) => {
-        if (!path) return "/placeholder-event.webp"; // Use a webp placeholder if available or just empty
+        if (!path) return "/placeholder-event.webp";
         if (path.startsWith("http")) return path;
-        // Construct Supabase public URL
         return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${path}`;
     };
+
+    // Decide what the button does:
+    // 1. Custom form exists -> open in-page modal
+    // 2. No custom form but external link exists -> open external link
+    // 3. Neither -> no button
+    const showCustomFormButton = hasCustomForm;
+    const showExternalLinkButton = !hasCustomForm && !!link;
 
     return (
         <motion.div
@@ -129,7 +173,6 @@ function EventCard({ name, description, path, date, time, link, index }: Upcomin
             transition={{ duration: 0.5, delay: index * 0.1 }}
             className="group relative flex flex-col h-full bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden hover:border-purple-500/30 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/10"
         >
-            {/* Image Container */}
             <div className="relative h-64 w-full overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10 transition-opacity duration-300 opacity-80 group-hover:opacity-60" />
 
@@ -145,10 +188,8 @@ function EventCard({ name, description, path, date, time, link, index }: Upcomin
                     </div>
                 )}
 
-                {/* Floating Date Badge */}
                 <div className="absolute top-4 right-4 z-20 bg-black/60 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl flex flex-col items-center justify-center text-white/90 shadow-lg">
                     <span className="text-xs font-medium uppercase text-purple-300">
-                        {/* If date is YYYY-MM-DD, try to format month. Else just show it. */}
                         {new Date(date).toLocaleDateString('en-US', { month: 'short', })}
                     </span>
                     <span className="text-xl font-bold font-mono">
@@ -157,7 +198,6 @@ function EventCard({ name, description, path, date, time, link, index }: Upcomin
                 </div>
             </div>
 
-            {/* Content */}
             <div className="flex flex-col flex-grow p-6 pt-2 z-20 -mt-12 relative">
                 <div className="mb-3">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-md font-medium text-purple-200 backdrop-blur-md">
@@ -174,8 +214,19 @@ function EventCard({ name, description, path, date, time, link, index }: Upcomin
                     {description}
                 </p>
 
-                {link && (
-                    <a
+                {showCustomFormButton && (
+                    <button
+                        onClick={onRegisterClick}
+                        className="mt-auto w-full group/btn relative overflow-hidden rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 px-4 py-3.5 text-center text-sm font-semibold text-white transition-all flex items-center justify-center gap-2"
+                    >
+                        <span>Register Now</span>
+                        <ClipboardEdit className="w-4 h-4 transition-transform group-hover/btn:translate-x-1 text-purple-300" />
+                        <div className="absolute inset-0 rounded-xl ring-2 ring-white/10 group-hover/btn:ring-purple-400/50 transition-all duration-300" />
+                    </button>
+                )}
+
+                {showExternalLinkButton && (
+                    
                         href={link}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -183,14 +234,136 @@ function EventCard({ name, description, path, date, time, link, index }: Upcomin
                     >
                         <span>Register Now</span>
                         <ExternalLink className="w-4 h-4 transition-transform group-hover/btn:translate-x-1 text-purple-300" />
-
-                        {/* Button Glow */}
                         <div className="absolute inset-0 rounded-xl ring-2 ring-white/10 group-hover/btn:ring-purple-400/50 transition-all duration-300" />
                     </a>
                 )}
             </div>
+        </motion.div>
+    );
+}
 
-            {/* Hover Glow Effect */}
+function RegistrationModal({ event, onClose }: { event: UpcomingEvent; onClose: () => void }) {
+    const supabase = createClient();
+    const [fields, setFields] = useState<FormField[]>([]);
+    const [values, setValues] = useState<Record<string, any>>({});
+    const [loading, setLoading] = useState(true);
+    const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        supabase
+            .from("event_forms")
+            .select("fields")
+            .eq("event_id", event.id)
+            .maybeSingle()
+            .then(({ data }) => {
+                setFields(data?.fields || []);
+                setLoading(false);
+            });
+    }, [event.id]);
+
+    const handleChange = (id: string, value: any) => {
+        setValues((prev) => ({ ...prev, [id]: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+
+        for (const f of fields) {
+            if (f.required && !values[f.id]) {
+                setError(`"${f.label}" is required`);
+                return;
+            }
+        }
+
+        const { error: insertError } = await supabase
+            .from("event_registrations")
+            .insert([{ event_id: event.id, form_data: values }]);
+
+        if (insertError) {
+            setError(insertError.message);
+            return;
+        }
+        setSubmitted(true);
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+        >
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="w-full max-w-lg rounded-2xl bg-[#0a0a0a] border border-white/10 p-6 shadow-2xl max-h-[85vh] overflow-y-auto"
+            >
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold text-white">Register — {event.name}</h3>
+                    <button onClick={onClose} className="text-gray-400 hover:text-white">
+                        <X className="h-5 w-5" />
+                    </button>
+                </div>
+
+                {loading ? (
+                    <div className="py-10 flex justify-center">
+                        <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+                    </div>
+                ) : submitted ? (
+                    <p className="text-center text-green-400 text-lg py-10">✅ Registered successfully!</p>
+                ) : (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {fields.map((field) => (
+                            <div key={field.id}>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    {field.label} {field.required && <span className="text-red-400">*</span>}
+                                </label>
+
+                                {field.type === "textarea" ? (
+                                    <textarea
+                                        className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2 text-white"
+                                        onChange={(e) => handleChange(field.id, e.target.value)}
+                                    />
+                                ) : field.type === "select" ? (
+                                    <select
+                                        className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2 text-white"
+                                        onChange={(e) => handleChange(field.id, e.target.value)}
+                                        defaultValue=""
+                                    >
+                                        <option value="" disabled>Select...</option>
+                                        {field.options?.map((opt) => (
+                                            <option key={opt} value={opt}>{opt}</option>
+                                        ))}
+                                    </select>
+                                ) : field.type === "checkbox" ? (
+                                    <input
+                                        type="checkbox"
+                                        onChange={(e) => handleChange(field.id, e.target.checked)}
+                                    />
+                                ) : (
+                                    <input
+                                        type={field.type === "phone" ? "tel" : field.type}
+                                        className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2 text-white"
+                                        onChange={(e) => handleChange(field.id, e.target.value)}
+                                    />
+                                )}
+                            </div>
+                        ))}
+
+                        {error && <p className="text-red-400 text-sm">{error}</p>}
+
+                        <button
+                            type="submit"
+                            className="w-full py-3 rounded-lg bg-purple-600 text-white font-semibold hover:bg-purple-500"
+                        >
+                            Submit Registration
+                        </button>
+                    </form>
+                )}
+            </motion.div>
         </motion.div>
     );
 }
