@@ -11,14 +11,14 @@ import {
     Trash,
     Upload,
     X,
-    ClipboardList, // ← NEW
-    Users,         // ← NEW
+    ClipboardList,
+    Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 // Types
 type UpcomingEvent = {
-    id: number;
+    id: string;
     name: string;
     description: string;
     path: string;
@@ -27,7 +27,6 @@ type UpcomingEvent = {
     link: string;
 };
 
-// ← NEW: form field + registration types
 type FieldType = "text" | "email" | "number" | "textarea" | "select" | "checkbox" | "phone";
 type FormField = {
     id: string;
@@ -47,17 +46,14 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
     const router = useRouter();
     const supabase = createClient();
 
-    // ← NEW: form builder modal state
     const [formEvent, setFormEvent] = useState<UpcomingEvent | null>(null);
     const [formFields, setFormFields] = useState<FormField[]>([]);
     const [formLoading, setFormLoading] = useState(false);
 
-    // ← NEW: registrations viewer modal state
     const [regEvent, setRegEvent] = useState<UpcomingEvent | null>(null);
     const [regRows, setRegRows] = useState<any[]>([]);
     const [regColumns, setRegColumns] = useState<string[]>([]);
 
-    // Reset form
     const resetForm = () => {
         setCurrentEvent({});
         setImageFile(null);
@@ -76,7 +72,7 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
         setDialogOpen(true);
     };
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this event?")) return;
 
         setLoading(true);
@@ -113,7 +109,7 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
                 path: imagePath,
                 date: currentEvent.date,
                 time: currentEvent.time,
-                link: currentEvent.link,
+                link: currentEvent.link || null,
             };
 
             if (currentEvent.id) {
@@ -140,7 +136,6 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
         }
     };
 
-    // ← NEW: open form builder for a specific event, loading its existing fields (if any)
     const openFormBuilder = async (event: UpcomingEvent) => {
         setFormEvent(event);
         setFormLoading(true);
@@ -153,7 +148,6 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
         setFormLoading(false);
     };
 
-    // ← NEW: field editing helpers
     const addFormField = () => {
         setFormFields([
             ...formFields,
@@ -167,7 +161,6 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
         setFormFields(formFields.filter((_, i) => i !== index));
     };
 
-    // ← NEW: save the form config for this event (upsert)
     const saveFormFields = async () => {
         if (!formEvent) return;
         setFormLoading(true);
@@ -195,7 +188,6 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
         alert("✅ Registration form saved");
     };
 
-    // ← NEW: open registrations viewer for a specific event
     const openRegistrations = async (event: UpcomingEvent) => {
         setRegEvent(event);
         const { data } = await supabase
@@ -211,7 +203,6 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
         setRegColumns(Array.from(keys));
     };
 
-    // ← NEW: CSV export for the open registrations modal
     const exportRegistrationsCSV = () => {
         if (!regEvent) return;
         const header = ["Submitted At", ...regColumns];
@@ -287,13 +278,16 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
                                     )}
                                 </td>
                                 <td className="px-6 py-4 max-w-[150px] truncate">
-                                    <a href={event.link} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline flex items-center gap-1">
-                                        <LinkIcon className="w-3 h-3" /> Link
-                                    </a>
+                                    {event.link ? (
+                                        <a href={event.link} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline flex items-center gap-1">
+                                            <LinkIcon className="w-3 h-3" /> Link
+                                        </a>
+                                    ) : (
+                                        <span className="text-gray-500 text-xs">—</span>
+                                    )}
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex justify-end gap-2">
-                                        {/* ← NEW: Configure registration form */}
                                         <button
                                             onClick={() => openFormBuilder(event)}
                                             title="Configure registration form"
@@ -301,7 +295,6 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
                                         >
                                             <ClipboardList className="h-4 w-4" />
                                         </button>
-                                        {/* ← NEW: View registrations */}
                                         <button
                                             onClick={() => openRegistrations(event)}
                                             title="View registrations"
@@ -336,7 +329,7 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
                 </table>
             </div>
 
-            {/* Create/Edit Event Dialog — unchanged */}
+            {/* Create/Edit Event Dialog */}
             {dialogOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
                     <div className="w-full max-w-2xl rounded-2xl bg-[#0a0a0a] border border-white/10 p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -416,17 +409,16 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-1">
-                                    Registration Link
+                                    Registration Link (Optional)
                                 </label>
                                 <input
                                     type="url"
-                                    required
                                     className="w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2 text-white focus:border-purple-500 focus:outline-none placeholder-gray-500"
                                     value={currentEvent.link || ""}
                                     onChange={(e) =>
                                         setCurrentEvent({ ...currentEvent, link: e.target.value })
                                     }
-                                    placeholder="https://..."
+                                    placeholder="https://... (leave blank if using custom registration form)"
                                 />
                             </div>
 
@@ -499,7 +491,7 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
                 </div>
             )}
 
-            {/* ← NEW: Form Builder Dialog */}
+            {/* Form Builder Dialog */}
             {formEvent && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
                     <div className="w-full max-w-2xl rounded-2xl bg-[#0a0a0a] border border-white/10 p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -587,7 +579,7 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
                 </div>
             )}
 
-            {/* ← NEW: Registrations Viewer Dialog */}
+            {/* Registrations Viewer Dialog */}
             {regEvent && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
                     <div className="w-full max-w-4xl rounded-2xl bg-[#0a0a0a] border border-white/10 p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
