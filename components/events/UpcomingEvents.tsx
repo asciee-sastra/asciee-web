@@ -220,7 +220,7 @@ function EventCard({
                 )}
 
                 {showExternalLinkButton && (
-                    
+                    <a
                         href={link}
                         target="_blank"
                         rel="noopener noreferrer"
