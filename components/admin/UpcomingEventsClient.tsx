@@ -11,6 +11,8 @@ import {
     Trash,
     Upload,
     X,
+    ClipboardList, // ← NEW
+    Users,         // ← NEW
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -19,10 +21,20 @@ type UpcomingEvent = {
     id: number;
     name: string;
     description: string;
-    path: string; // single image path
+    path: string;
     date: string;
     time: string;
     link: string;
+};
+
+// ← NEW: form field + registration types
+type FieldType = "text" | "email" | "number" | "textarea" | "select" | "checkbox" | "phone";
+type FormField = {
+    id: string;
+    label: string;
+    type: FieldType;
+    required: boolean;
+    options?: string[];
 };
 
 export default function UpcomingEventsClient({ initialEvents }: { initialEvents: UpcomingEvent[] }) {
@@ -35,6 +47,16 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
     const router = useRouter();
     const supabase = createClient();
 
+    // ← NEW: form builder modal state
+    const [formEvent, setFormEvent] = useState<UpcomingEvent | null>(null);
+    const [formFields, setFormFields] = useState<FormField[]>([]);
+    const [formLoading, setFormLoading] = useState(false);
+
+    // ← NEW: registrations viewer modal state
+    const [regEvent, setRegEvent] = useState<UpcomingEvent | null>(null);
+    const [regRows, setRegRows] = useState<any[]>([]);
+    const [regColumns, setRegColumns] = useState<string[]>([]);
+
     // Reset form
     const resetForm = () => {
         setCurrentEvent({});
@@ -43,20 +65,17 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
         setDialogOpen(false);
     };
 
-    // Open Dialog for Create
     const handleOpenCreate = () => {
         resetForm();
         setDialogOpen(true);
     };
 
-    // Open Dialog for Edit
     const handleOpenEdit = (event: UpcomingEvent) => {
         setCurrentEvent(event);
-        setImageFile(null); // New file to replace existing
+        setImageFile(null);
         setDialogOpen(true);
     };
 
-    // Delete Event
     const handleDelete = async (id: number) => {
         if (!confirm("Are you sure you want to delete this event?")) return;
 
@@ -71,7 +90,6 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
         setLoading(false);
     };
 
-    // Handle Form Submit
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setUploading(true);
@@ -79,12 +97,11 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
         try {
             let imagePath = currentEvent.path || "";
 
-            // Upload new image if selected
             if (imageFile) {
                 const fileName = `${Date.now()}-${imageFile.name}`;
                 const { data, error } = await supabase.storage
-                    .from("events") // Using same 'events' bucket
-                    .upload(`upcoming/${fileName}`, imageFile); // Organize in 'upcoming' folder
+                    .from("events")
+                    .upload(`upcoming/${fileName}`, imageFile);
 
                 if (error) throw error;
                 imagePath = `events/upcoming/${fileName}`;
@@ -100,14 +117,12 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
             };
 
             if (currentEvent.id) {
-                // Update
                 const { error } = await supabase
                     .from("upcomingevents")
                     .update(eventData)
                     .eq("id", currentEvent.id);
                 if (error) throw error;
             } else {
-                // Insert
                 const { error } = await supabase.from("upcomingevents").insert([eventData]);
                 if (error) throw error;
             }
@@ -115,7 +130,6 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
             setDialogOpen(false);
             router.refresh();
 
-            // Fetch updated list
             const { data } = await supabase.from("upcomingevents").select("*").order("date", { ascending: true });
             if (data) setEvents(data as UpcomingEvent[]);
 
@@ -124,6 +138,94 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
         } finally {
             setUploading(false);
         }
+    };
+
+    // ← NEW: open form builder for a specific event, loading its existing fields (if any)
+    const openFormBuilder = async (event: UpcomingEvent) => {
+        setFormEvent(event);
+        setFormLoading(true);
+        const { data } = await supabase
+            .from("event_forms")
+            .select("*")
+            .eq("event_id", event.id)
+            .maybeSingle();
+        setFormFields(data?.fields || []);
+        setFormLoading(false);
+    };
+
+    // ← NEW: field editing helpers
+    const addFormField = () => {
+        setFormFields([
+            ...formFields,
+            { id: `field_${Date.now()}`, label: "", type: "text", required: false },
+        ]);
+    };
+    const updateFormField = (index: number, patch: Partial<FormField>) => {
+        setFormFields(formFields.map((f, i) => (i === index ? { ...f, ...patch } : f)));
+    };
+    const removeFormField = (index: number) => {
+        setFormFields(formFields.filter((_, i) => i !== index));
+    };
+
+    // ← NEW: save the form config for this event (upsert)
+    const saveFormFields = async () => {
+        if (!formEvent) return;
+        setFormLoading(true);
+
+        const { data: existing } = await supabase
+            .from("event_forms")
+            .select("id")
+            .eq("event_id", formEvent.id)
+            .maybeSingle();
+
+        if (existing) {
+            const { error } = await supabase
+                .from("event_forms")
+                .update({ fields: formFields, updated_at: new Date().toISOString() })
+                .eq("id", existing.id);
+            if (error) { alert(error.message); setFormLoading(false); return; }
+        } else {
+            const { error } = await supabase
+                .from("event_forms")
+                .insert([{ event_id: formEvent.id, fields: formFields }]);
+            if (error) { alert(error.message); setFormLoading(false); return; }
+        }
+
+        setFormLoading(false);
+        alert("✅ Registration form saved");
+    };
+
+    // ← NEW: open registrations viewer for a specific event
+    const openRegistrations = async (event: UpcomingEvent) => {
+        setRegEvent(event);
+        const { data } = await supabase
+            .from("event_registrations")
+            .select("*")
+            .eq("event_id", event.id)
+            .order("created_at", { ascending: false });
+
+        const rows = data || [];
+        setRegRows(rows);
+        const keys = new Set<string>();
+        rows.forEach((r) => Object.keys(r.form_data || {}).forEach((k) => keys.add(k)));
+        setRegColumns(Array.from(keys));
+    };
+
+    // ← NEW: CSV export for the open registrations modal
+    const exportRegistrationsCSV = () => {
+        if (!regEvent) return;
+        const header = ["Submitted At", ...regColumns];
+        const lines = regRows.map((r) => [
+            new Date(r.created_at).toLocaleString(),
+            ...regColumns.map((c) => JSON.stringify(r.form_data?.[c] ?? "")),
+        ]);
+        const csv = [header, ...lines].map((row) => row.join(",")).join("\n");
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `registrations_${regEvent.name.replace(/\s+/g, "_")}.csv`;
+        a.click();
     };
 
     return (
@@ -174,7 +276,6 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
                                 <td className="px-6 py-4">
                                     {event.path ? (
                                         <div className="w-10 h-10 rounded overflow-hidden border border-white/10">
-                                            {/* Try both full URL and Supabase storage path just in case */}
                                             <img
                                                 src={event.path.startsWith('http') ? event.path : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${event.path}`}
                                                 alt={event.name}
@@ -192,6 +293,22 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex justify-end gap-2">
+                                        {/* ← NEW: Configure registration form */}
+                                        <button
+                                            onClick={() => openFormBuilder(event)}
+                                            title="Configure registration form"
+                                            className="rounded p-2 text-purple-400 hover:bg-purple-400/10 transition-colors"
+                                        >
+                                            <ClipboardList className="h-4 w-4" />
+                                        </button>
+                                        {/* ← NEW: View registrations */}
+                                        <button
+                                            onClick={() => openRegistrations(event)}
+                                            title="View registrations"
+                                            className="rounded p-2 text-green-400 hover:bg-green-400/10 transition-colors"
+                                        >
+                                            <Users className="h-4 w-4" />
+                                        </button>
                                         <button
                                             onClick={() => handleOpenEdit(event)}
                                             className="rounded p-2 text-blue-400 hover:bg-blue-400/10 transition-colors"
@@ -219,7 +336,7 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
                 </table>
             </div>
 
-            {/* Dialog */}
+            {/* Create/Edit Event Dialog — unchanged */}
             {dialogOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
                     <div className="w-full max-w-2xl rounded-2xl bg-[#0a0a0a] border border-white/10 p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -378,6 +495,147 @@ export default function UpcomingEventsClient({ initialEvents }: { initialEvents:
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* ← NEW: Form Builder Dialog */}
+            {formEvent && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="w-full max-w-2xl rounded-2xl bg-[#0a0a0a] border border-white/10 p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-bold text-white">
+                                Registration Form — {formEvent.name}
+                            </h3>
+                            <button
+                                onClick={() => setFormEvent(null)}
+                                className="rounded-full p-1 text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            {formFields.map((field, i) => (
+                                <div key={field.id} className="rounded-lg border border-white/10 bg-white/5 p-4 space-y-3">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <input
+                                            placeholder="Field label (e.g. Full Name)"
+                                            className="flex-1 min-w-[140px] rounded bg-white/5 border border-white/10 px-3 py-1.5 text-white text-sm"
+                                            value={field.label}
+                                            onChange={(e) => updateFormField(i, { label: e.target.value })}
+                                        />
+                                        <select
+                                            className="rounded bg-white/5 border border-white/10 px-2 py-1.5 text-white text-sm"
+                                            value={field.type}
+                                            onChange={(e) => updateFormField(i, { type: e.target.value as FieldType })}
+                                        >
+                                            <option value="text">Text</option>
+                                            <option value="email">Email</option>
+                                            <option value="number">Number</option>
+                                            <option value="phone">Phone</option>
+                                            <option value="textarea">Textarea</option>
+                                            <option value="select">Dropdown</option>
+                                            <option value="checkbox">Checkbox</option>
+                                        </select>
+                                        <label className="flex items-center gap-1 text-xs text-gray-400">
+                                            <input
+                                                type="checkbox"
+                                                checked={field.required}
+                                                onChange={(e) => updateFormField(i, { required: e.target.checked })}
+                                            />
+                                            Required
+                                        </label>
+                                        <button onClick={() => removeFormField(i)} className="text-red-400 hover:bg-red-400/10 p-1 rounded">
+                                            <Trash className="h-4 w-4" />
+                                        </button>
+                                    </div>
+
+                                    {field.type === "select" && (
+                                        <input
+                                            placeholder="Options, comma separated (e.g. CSE, ECE, EEE)"
+                                            className="w-full rounded bg-white/5 border border-white/10 px-3 py-1.5 text-white text-sm"
+                                            value={field.options?.join(", ") || ""}
+                                            onChange={(e) =>
+                                                updateFormField(i, { options: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })
+                                            }
+                                        />
+                                    )}
+                                </div>
+                            ))}
+                            {formFields.length === 0 && (
+                                <p className="text-sm text-gray-500">No fields yet — click "Add Field" to build this event's registration form.</p>
+                            )}
+                        </div>
+
+                        <div className="flex justify-between items-center pt-4 mt-4 border-t border-white/10">
+                            <button
+                                onClick={addFormField}
+                                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 text-white hover:bg-white/5"
+                            >
+                                <Plus className="h-4 w-4" /> Add Field
+                            </button>
+                            <button
+                                onClick={saveFormFields}
+                                disabled={formLoading}
+                                className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-500 transition-colors disabled:opacity-50"
+                            >
+                                {formLoading ? "Saving..." : "Save Form"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ← NEW: Registrations Viewer Dialog */}
+            {regEvent && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="w-full max-w-4xl rounded-2xl bg-[#0a0a0a] border border-white/10 p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-xl font-bold text-white">
+                                Registrations — {regEvent.name} ({regRows.length})
+                            </h3>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={exportRegistrationsCSV}
+                                    className="rounded-lg bg-purple-600 px-3 py-1.5 text-sm text-white hover:bg-purple-500"
+                                >
+                                    Export CSV
+                                </button>
+                                <button
+                                    onClick={() => setRegEvent(null)}
+                                    className="rounded-full p-1 text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="overflow-x-auto rounded-lg border border-white/10">
+                            <table className="w-full text-sm text-left text-gray-300">
+                                <thead className="bg-white/10 text-xs uppercase">
+                                    <tr>
+                                        <th className="px-4 py-2">Submitted</th>
+                                        {regColumns.map((c) => <th key={c} className="px-4 py-2">{c}</th>)}
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/10">
+                                    {regRows.map((r) => (
+                                        <tr key={r.id}>
+                                            <td className="px-4 py-2">{new Date(r.created_at).toLocaleString()}</td>
+                                            {regColumns.map((c) => <td key={c} className="px-4 py-2">{String(r.form_data?.[c] ?? "")}</td>)}
+                                        </tr>
+                                    ))}
+                                    {regRows.length === 0 && (
+                                        <tr>
+                                            <td colSpan={regColumns.length + 1} className="px-4 py-8 text-center text-gray-400">
+                                                No registrations yet.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             )}
