@@ -28,7 +28,12 @@ type Member = {
   role: string;
   path?: string;
 };
-
+const formatRole = (role: string) =>
+  role
+    .replace(/^Technical Affairs\s*-\s*/i, "")
+    .replace(/^Operations & Admin\s*-\s*/i, "")
+    .replace(/^External Relations\s*-\s*/i, "")
+    .trim();
 // ── Core Members (year-based) tabs ──
 const yearTabs: { label: string; key: "secondyr" | "thirdyr" | "fourthyr" }[] = [
   { label: "4th Year", key: "fourthyr" },
@@ -173,7 +178,7 @@ export default function CoordinatorsPage() {
         </Tilt>
       ))}
       {members.length === 0 && (
-        <p className="text-center text-gray-400 py-10">No members found.</p>
+       <p className="text-xs text-gray-200">{formatRole(member.role)}</p>
       )}
     </div>
   );
