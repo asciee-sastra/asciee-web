@@ -45,11 +45,18 @@ export default function UpcomingEvents() {
 
                 const { data: forms } = await supabase
                     .from("event_forms")
-                    .select("event_id, fields");
+                    .select("event_id, fields, is_open, close_at");
                 if (forms) {
+                    const now = new Date();
                     const ids = new Set(
-                        forms.filter((f: any) => Array.isArray(f.fields) && f.fields.length > 0)
-                             .map((f: any) => f.event_id)
+                        forms
+                            .filter((f: any) => {
+                                const hasFields = Array.isArray(f.fields) && f.fields.length > 0;
+                                const notManuallyClosed = f.is_open !== false;
+                                const notAutoClosed = !f.close_at || new Date(f.close_at) > now;
+                                return hasFields && notManuallyClosed && notAutoClosed;
+                            })
+                            .map((f: any) => f.event_id)
                     );
                     setFormEventIds(ids);
                 }
@@ -220,7 +227,7 @@ function EventCard({
                 )}
 
                 {showExternalLinkButton && (
-                    <a
+                    
                         href={link}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -242,16 +249,20 @@ function RegistrationModal({ event, onClose }: { event: UpcomingEvent; onClose: 
     const [values, setValues] = useState<Record<string, any>>({});
     const [loading, setLoading] = useState(true);
     const [submitted, setSubmitted] = useState(false);
+    const [closed, setClosed] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         supabase
             .from("event_forms")
-            .select("fields")
+            .select("fields, is_open, close_at")
             .eq("event_id", event.id)
             .maybeSingle()
             .then(({ data }) => {
-                setFields(data?.fields || []);
+                const now = new Date();
+                const isClosed = data?.is_open === false || (!!data?.close_at && new Date(data.close_at) <= now);
+                setClosed(isClosed);
+                setFields(isClosed ? [] : (data?.fields || []));
                 setLoading(false);
             });
     }, [event.id]);
@@ -306,6 +317,8 @@ function RegistrationModal({ event, onClose }: { event: UpcomingEvent; onClose: 
                     <div className="py-10 flex justify-center">
                         <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
                     </div>
+                ) : closed ? (
+                    <p className="text-center text-gray-400 text-lg py-10">Registration for this event is now closed.</p>
                 ) : submitted ? (
                     <p className="text-center text-green-400 text-lg py-10">✅ Registered successfully!</p>
                 ) : (
