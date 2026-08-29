@@ -28,21 +28,20 @@ type Member = {
   role: string;
   path?: string;
 };
+
 const formatRole = (role: string) =>
   role
     .replace(/^Technical Affairs\s*-\s*/i, "")
     .replace(/^Operations & Admin\s*-\s*/i, "")
     .replace(/^External Relations\s*-\s*/i, "")
     .trim();
-// ── Core Members (year-based) tabs ──
+
 const yearTabs: { label: string; key: "secondyr" | "thirdyr" | "fourthyr" }[] = [
   { label: "4th Year", key: "fourthyr" },
   { label: "3rd Year", key: "thirdyr" },
   { label: "2nd Year", key: "secondyr" },
 ];
 
-// ── Cluster Heads sub-tabs — all pull from the same `heads` table,
-// split purely by a role-text prefix. No new tables needed. ──
 type HeadsTabKey = "clusterheads" | "technicalaffairs" | "opsadmin" | "externalrelations";
 
 const headsTabs: { label: string; key: HeadsTabKey; filter: (role: string) => boolean }[] = [
@@ -178,8 +177,9 @@ export default function CoordinatorsPage() {
         </Tilt>
       ))}
       {members.length === 0 && (
-  <p className="text-center text-gray-400 py-10">No members found.</p>
-)}
+        <p className="text-center text-gray-400 py-10">No members found.</p>
+      )}
+    </div>
   );
 
   const activeHeadsFilter = headsTabs.find((t) => t.key === activeHeadsTab)!.filter;
@@ -196,16 +196,10 @@ export default function CoordinatorsPage() {
         </p>
       </div>
 
-      {/* Presidents Section */}
       {renderGrid(presidents, "presidents")}
-
-      {/* Secretaries Section */}
       {renderGrid(secretaries, "secretaries")}
-
-      {/* Joint Secretaries Section */}
       {renderGrid(jointSecretaries, "jointsecretaries")}
 
-      {/* ── Cluster Heads Section — now tabbed instead of one flat grid ── */}
       <h1 className="flex items-center justify-center text-xl md:text-4xl font-bold mt-16 mb-4 text-white text-center">
         Cluster Heads
       </h1>
@@ -240,7 +234,6 @@ export default function CoordinatorsPage() {
         </AnimatePresence>
       </div>
 
-      {/* Core Members Section */}
       <h1 className="flex items-center justify-center text-xl md:text-4xl font-bold mt-16 mb-4 text-white text-center">
         Core Members
       </h1>
