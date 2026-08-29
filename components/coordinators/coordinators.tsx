@@ -13,9 +13,9 @@ const supabase = createClient(
 );
 
 const STORAGE = {
-  presidents: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/fourthyr`, // 👈 presidents images in 4th year bucket
+  presidents: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/fourthyr`,
   secretaries: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/thirdyr`,
-  jointsecretaries: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/secondyr`, // 👈 joint secretaries images in 2nd year bucket
+  jointsecretaries: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/secondyr`,
   heads: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/thirdyr`,
   secondyr: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/secondyr`,
   thirdyr: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/thirdyr`,
@@ -29,10 +29,41 @@ type Member = {
   path?: string;
 };
 
-const tabs: { label: string; key: "secondyr" | "thirdyr" | "fourthyr" }[] = [
+// ── Core Members (year-based) tabs ──
+const yearTabs: { label: string; key: "secondyr" | "thirdyr" | "fourthyr" }[] = [
   { label: "4th Year", key: "fourthyr" },
   { label: "3rd Year", key: "thirdyr" },
   { label: "2nd Year", key: "secondyr" },
+];
+
+// ── Cluster Heads sub-tabs — all pull from the same `heads` table,
+// split purely by a role-text prefix. No new tables needed. ──
+type HeadsTabKey = "clusterheads" | "technicalaffairs" | "opsadmin" | "externalrelations";
+
+const headsTabs: { label: string; key: HeadsTabKey; filter: (role: string) => boolean }[] = [
+  {
+    label: "Cluster Heads",
+    key: "clusterheads",
+    filter: (role) =>
+      !role.startsWith("Technical Affairs") &&
+      !role.startsWith("Operations & Admin") &&
+      !role.startsWith("External Relations"),
+  },
+  {
+    label: "Technical Affairs",
+    key: "technicalaffairs",
+    filter: (role) => role.startsWith("Technical Affairs"),
+  },
+  {
+    label: "Operations & Admin",
+    key: "opsadmin",
+    filter: (role) => role.startsWith("Operations & Admin"),
+  },
+  {
+    label: "External Relations",
+    key: "externalrelations",
+    filter: (role) => role.startsWith("External Relations"),
+  },
 ];
 
 export default function CoordinatorsPage() {
@@ -45,9 +76,9 @@ export default function CoordinatorsPage() {
   const [fourthYr, setFourthYr] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<
-    "secondyr" | "thirdyr" | "fourthyr"
-  >("fourthyr");
+
+  const [activeYearTab, setActiveYearTab] = useState<"secondyr" | "thirdyr" | "fourthyr">("fourthyr");
+  const [activeHeadsTab, setActiveHeadsTab] = useState<HeadsTabKey>("clusterheads");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -114,7 +145,7 @@ export default function CoordinatorsPage() {
           rotationFactor={10}
           springOptions={{ stiffness: 150, damping: 12 }}
           className="flex-shrink-0 relative flex flex-col items-center rounded-3xl overflow-hidden shadow-lg border glass-card max-h-[480px]"
-          style={{ width: "260px", height: "320px" }} // 👈 fixed size like before
+          style={{ width: "260px", height: "320px" }}
         >
           <div className="relative w-full h-full rounded-2xl overflow-hidden">
             {member.path ? (
@@ -141,15 +172,21 @@ export default function CoordinatorsPage() {
           </div>
         </Tilt>
       ))}
+      {members.length === 0 && (
+        <p className="text-center text-gray-400 py-10">No members found.</p>
+      )}
     </div>
   );
+
+  const activeHeadsFilter = headsTabs.find((t) => t.key === activeHeadsTab)!.filter;
+  const filteredHeads = heads.filter((m) => activeHeadsFilter(m.role));
 
   return (
     <section className="mt-24 mb-6 bg-transparent px-6">
       <div className="text-center mb-8">
         <h1 className="text-4xl md:text-6xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 drop-shadow-sm">
-            Coordinators
-          </h1>
+          Coordinators
+        </h1>
         <p className="mt-3 text-base md:text-lg text-gray-300">
           The ones who make it all possible
         </p>
@@ -157,17 +194,47 @@ export default function CoordinatorsPage() {
 
       {/* Presidents Section */}
       {renderGrid(presidents, "presidents")}
-      {/* Secretaries Section */}
 
+      {/* Secretaries Section */}
       {renderGrid(secretaries, "secretaries")}
+
       {/* Joint Secretaries Section */}
       {renderGrid(jointSecretaries, "jointsecretaries")}
 
-      {/* Heads Section */}
-      <h1 className="flex items-center justify-center text-xl md:text-4xl font-bold mt-16 mb-8 text-white text-center">
+      {/* ── Cluster Heads Section — now tabbed instead of one flat grid ── */}
+      <h1 className="flex items-center justify-center text-xl md:text-4xl font-bold mt-16 mb-4 text-white text-center">
         Cluster Heads
       </h1>
-      {renderGrid(heads, "heads")}
+
+      <div className="w-fit mx-auto">
+        <div className="flex w-fit mx-auto items-center gap-2 bg-white/5 px-3 py-2 rounded-full backdrop-blur-sm border border-white/10 z-10 mb-6 flex-wrap justify-center">
+          {headsTabs.map(({ label, key }) => (
+            <button
+              key={key}
+              onClick={() => setActiveHeadsTab(key)}
+              className={`flex items-center justify-center px-4 py-2 cursor-pointer rounded-full text-sm transition whitespace-nowrap ${
+                activeHeadsTab === key
+                  ? "text-white bg-gradient-to-r from-[#720E9E] to-[#9D4EDD]"
+                  : "text-white hover:bg-white/10"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeHeadsTab}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {renderGrid(filteredHeads, "heads")}
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       {/* Core Members Section */}
       <h1 className="flex items-center justify-center text-xl md:text-4xl font-bold mt-16 mb-4 text-white text-center">
@@ -175,25 +242,24 @@ export default function CoordinatorsPage() {
       </h1>
 
       <div className="w-fit mx-auto">
-        {/* Tabs */}
         <div className="flex w-fit mx-auto items-center gap-2 bg-white/5 px-3 py-2 rounded-full backdrop-blur-sm border border-white/10 z-10 mb-6">
-          {tabs.map(({ label, key }) => (
+          {yearTabs.map(({ label, key }) => (
             <button
               key={key}
-              onClick={() => setActiveTab(key)}
-              className={`flex items-center justify-center px-4 py-2 cursor-pointer rounded-full text-sm transition ${activeTab === key
+              onClick={() => setActiveYearTab(key)}
+              className={`flex items-center justify-center px-4 py-2 cursor-pointer rounded-full text-sm transition ${
+                activeYearTab === key
                   ? "text-white bg-gradient-to-r from-[#720E9E] to-[#9D4EDD]"
                   : "text-white hover:bg-white/10"
-                }`}
+              }`}
             >
               {label}
             </button>
           ))}
         </div>
 
-        {/* Tab Content with fade animation */}
         <AnimatePresence mode="wait">
-          {activeTab === "secondyr" && (
+          {activeYearTab === "secondyr" && (
             <motion.div
               key="secondyr"
               initial={{ opacity: 0 }}
@@ -204,7 +270,7 @@ export default function CoordinatorsPage() {
               {renderGrid(secondYr, "secondyr")}
             </motion.div>
           )}
-          {activeTab === "thirdyr" && (
+          {activeYearTab === "thirdyr" && (
             <motion.div
               key="thirdyr"
               initial={{ opacity: 0 }}
@@ -215,7 +281,7 @@ export default function CoordinatorsPage() {
               {renderGrid(thirdYr, "thirdyr")}
             </motion.div>
           )}
-          {activeTab === "fourthyr" && (
+          {activeYearTab === "fourthyr" && (
             <motion.div
               key="fourthyr"
               initial={{ opacity: 0 }}
