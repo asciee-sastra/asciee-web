@@ -26,10 +26,10 @@ type FormField = {
 
 export default function UpcomingEvents() {
     const [events, setEvents] = useState<UpcomingEvent[]>([]);
-    const [formEventIds, setFormEventIds] = useState<Set<string>>(new Set()); // events that have a custom form
+    const [formEventIds, setFormEventIds] = useState<Set<string>>(new Set());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [registerEvent, setRegisterEvent] = useState<UpcomingEvent | null>(null); // modal state
+    const [registerEvent, setRegisterEvent] = useState<UpcomingEvent | null>(null);
     const supabase = createClient();
 
     useEffect(() => {
@@ -43,7 +43,6 @@ export default function UpcomingEvents() {
                 if (error) throw error;
                 if (data) setEvents(data as UpcomingEvent[]);
 
-                // Find which events have a non-empty custom form
                 const { data: forms } = await supabase
                     .from("event_forms")
                     .select("event_id, fields");
@@ -126,7 +125,6 @@ export default function UpcomingEvents() {
                 </motion.div>
             )}
 
-            {/* Registration Modal */}
             <AnimatePresence>
                 {registerEvent && (
                     <RegistrationModal
@@ -158,10 +156,6 @@ function EventCard({
         return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${path}`;
     };
 
-    // Decide what the button does:
-    // 1. Custom form exists -> open in-page modal
-    // 2. No custom form but external link exists -> open external link
-    // 3. Neither -> no button
     const showCustomFormButton = hasCustomForm;
     const showExternalLinkButton = !hasCustomForm && !!link;
 
