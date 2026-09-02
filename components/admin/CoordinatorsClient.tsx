@@ -42,11 +42,11 @@ const GROUPS: Record<string, GroupConfig> = {
         table: "secretaries"
     },
 
-    jointsec: {
+ /*   jointsec: {
         label: "Joint Sec",
         bucket: "secondyr",
         table: "jointsec"
-    },
+    },*/
 
     heads: {
         label: "Cluster Heads",
