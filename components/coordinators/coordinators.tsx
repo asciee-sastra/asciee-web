@@ -15,7 +15,6 @@ const supabase = createClient(
 const STORAGE = {
   presidents: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/fourthyr`,
   secretaries: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/thirdyr`,
-  jointsecretaries: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/secondyr`,
   heads: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/thirdyr`,
   secondyr: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/secondyr`,
   thirdyr: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/thirdyr`,
@@ -36,23 +35,25 @@ const formatRole = (role: string) =>
     .replace(/^External Relations\s*-\s*/i, "")
     .trim();
 
-const yearTabs: { label: string; key: "secondyr" | "thirdyr" | "fourthyr" }[] = [
+const yearTabs: {
+  label: string;
+  key: "secondyr" | "thirdyr" | "fourthyr";
+}[] = [
   { label: "4th Year", key: "fourthyr" },
   { label: "3rd Year", key: "thirdyr" },
   { label: "2nd Year", key: "secondyr" },
 ];
 
-type HeadsTabKey = "clusterheads" | "technicalaffairs" | "opsadmin" | "externalrelations";
+type HeadsTabKey =
+  | "technicalaffairs"
+  | "opsadmin"
+  | "externalrelations";
 
-const headsTabs: { label: string; key: HeadsTabKey; filter: (role: string) => boolean }[] = [
-  {
-    label: "Cluster Heads",
-    key: "clusterheads",
-    filter: (role) =>
-      !role.startsWith("Technical Affairs") &&
-      !role.startsWith("Operations & Admin") &&
-      !role.startsWith("External Relations"),
-  },
+const headsTabs: {
+  label: string;
+  key: HeadsTabKey;
+  filter: (role: string) => boolean;
+}[] = [
   {
     label: "Technical Affairs",
     key: "technicalaffairs",
@@ -73,54 +74,87 @@ const headsTabs: { label: string; key: HeadsTabKey; filter: (role: string) => bo
 export default function CoordinatorsPage() {
   const [presidents, setPresidents] = useState<Member[]>([]);
   const [secretaries, setSecretaries] = useState<Member[]>([]);
-  const [jointSecretaries, setJointSecretaries] = useState<Member[]>([]);
   const [heads, setHeads] = useState<Member[]>([]);
   const [secondYr, setSecondYr] = useState<Member[]>([]);
   const [thirdYr, setThirdYr] = useState<Member[]>([]);
   const [fourthYr, setFourthYr] = useState<Member[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const [activeYearTab, setActiveYearTab] = useState<"secondyr" | "thirdyr" | "fourthyr">("fourthyr");
-  const [activeHeadsTab, setActiveHeadsTab] = useState<HeadsTabKey>("clusterheads");
+  const [activeYearTab, setActiveYearTab] = useState<
+    "secondyr" | "thirdyr" | "fourthyr"
+  >("fourthyr");
+
+  const [activeHeadsTab, setActiveHeadsTab] =
+    useState<HeadsTabKey>("technicalaffairs");
 
   useEffect(() => {
     const fetchData = async () => {
-      const [presRes, secRes, jointRes, headsRes, second, third, fourth] =
-        await Promise.all([
-          supabase.from("presidents").select("*").order("id", { ascending: true }),
-          supabase.from("secretaries").select("*").order("id", { ascending: true }),
-          supabase.from("jointsec").select("*").order("id", { ascending: true }),
-          supabase.from("heads").select("*").order("id", { ascending: true }),
-          supabase.from("secondyr").select("*").order("id", { ascending: true }),
-          supabase.from("thirdyr").select("*").order("id", { ascending: true }),
-          supabase.from("fourthyr").select("*").order("id", { ascending: true }),
-        ]);
+      const [
+        presRes,
+        secRes,
+        headsRes,
+        second,
+        third,
+        fourth,
+      ] = await Promise.all([
+        supabase
+          .from("presidents")
+          .select("*")
+          .order("id", { ascending: true }),
+
+        supabase
+          .from("secretaries")
+          .select("*")
+          .order("id", { ascending: true }),
+
+        supabase
+          .from("heads")
+          .select("*")
+          .order("id", { ascending: true }),
+
+        supabase
+          .from("secondyr")
+          .select("*")
+          .order("id", { ascending: true }),
+
+        supabase
+          .from("thirdyr")
+          .select("*")
+          .order("id", { ascending: true }),
+
+        supabase
+          .from("fourthyr")
+          .select("*")
+          .order("id", { ascending: true }),
+      ]);
 
       if (
         presRes.error ||
         secRes.error ||
-        jointRes.error ||
         headsRes.error ||
         second.error ||
         third.error ||
         fourth.error
       ) {
         setErrorMsg(
-          `${presRes.error?.message ?? ""} ${secRes.error?.message ?? ""}
-          ${jointRes.error?.message ?? ""} ${headsRes.error?.message ?? ""}
-          ${second.error?.message ?? ""} ${third.error?.message ?? ""}
+          `${presRes.error?.message ?? ""}
+          ${secRes.error?.message ?? ""}
+          ${headsRes.error?.message ?? ""}
+          ${second.error?.message ?? ""}
+          ${third.error?.message ?? ""}
           ${fourth.error?.message ?? ""}`.trim()
         );
       }
 
       setPresidents(presRes.data || []);
       setSecretaries(secRes.data || []);
-      setJointSecretaries(jointRes.data || []);
       setHeads(headsRes.data || []);
       setSecondYr(second.data || []);
       setThirdYr(third.data || []);
       setFourthYr(fourth.data || []);
+
       setLoading(false);
     };
 
@@ -141,7 +175,10 @@ export default function CoordinatorsPage() {
       </p>
     );
 
-  const renderGrid = (members: Member[], bucket: keyof typeof STORAGE) => (
+  const renderGrid = (
+    members: Member[],
+    bucket: keyof typeof STORAGE
+  ) => (
     <div className="flex flex-wrap justify-center gap-6 mb-16 px-6 sm:px-12 md:px-24">
       {members.map((member) => (
         <Tilt
@@ -170,20 +207,33 @@ export default function CoordinatorsPage() {
             )}
 
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-2/3 bg-gradient-to-r from-black/70 via-black/40 to-black/70 backdrop-blur-lg border border-white/10 text-white px-5 py-2 rounded-full shadow-lg flex flex-col items-center">
-              <h3 className="text-sm font-semibold">{member.name}</h3>
-              <p className="text-xs text-gray-200">{formatRole(member.role)}</p>
+              <h3 className="text-sm font-semibold">
+                {member.name}
+              </h3>
+
+              <p className="text-xs text-gray-200">
+                {formatRole(member.role)}
+              </p>
             </div>
           </div>
         </Tilt>
       ))}
+
       {members.length === 0 && (
-        <p className="text-center text-gray-400 py-10">No members found.</p>
+        <p className="text-center text-gray-400 py-10">
+          No members found.
+        </p>
       )}
     </div>
   );
 
-  const activeHeadsFilter = headsTabs.find((t) => t.key === activeHeadsTab)!.filter;
-  const filteredHeads = heads.filter((m) => activeHeadsFilter(m.role));
+  const activeHeadsFilter = headsTabs.find(
+    (t) => t.key === activeHeadsTab
+  )!.filter;
+
+  const filteredHeads = heads.filter((m) =>
+    activeHeadsFilter(m.role)
+  );
 
   return (
     <section className="mt-24 mb-6 bg-transparent px-6">
@@ -191,17 +241,21 @@ export default function CoordinatorsPage() {
         <h1 className="text-4xl md:text-6xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 drop-shadow-sm">
           Coordinators
         </h1>
+
         <p className="mt-3 text-base md:text-lg text-gray-300">
           The ones who make it all possible
         </p>
       </div>
 
+      {/* Presidents */}
       {renderGrid(presidents, "presidents")}
-      {renderGrid(secretaries, "secretaries")}
-      {renderGrid(jointSecretaries, "jointsecretaries")}
 
+      {/* Secretaries */}
+      {renderGrid(secretaries, "secretaries")}
+
+      {/* Department Heads */}
       <h1 className="flex items-center justify-center text-xl md:text-4xl font-bold mt-16 mb-4 text-white text-center">
-        Cluster Heads
+        Department Heads
       </h1>
 
       <div className="w-fit mx-auto">
@@ -234,6 +288,7 @@ export default function CoordinatorsPage() {
         </AnimatePresence>
       </div>
 
+      {/* Core Members */}
       <h1 className="flex items-center justify-center text-xl md:text-4xl font-bold mt-16 mb-4 text-white text-center">
         Core Members
       </h1>
@@ -267,6 +322,7 @@ export default function CoordinatorsPage() {
               {renderGrid(secondYr, "secondyr")}
             </motion.div>
           )}
+
           {activeYearTab === "thirdyr" && (
             <motion.div
               key="thirdyr"
@@ -278,6 +334,7 @@ export default function CoordinatorsPage() {
               {renderGrid(thirdYr, "thirdyr")}
             </motion.div>
           )}
+
           {activeYearTab === "fourthyr" && (
             <motion.div
               key="fourthyr"
