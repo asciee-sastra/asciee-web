@@ -6,7 +6,7 @@ import { Tilt } from "../motion-primitives/tilt";
 import { Boxes, Calendar } from "lucide-react";
 
 // ✏️ EDIT ONLY THESE TWO LINES WHEN RECRUITMENT CHANGES
-const RECRUITMENT_OPEN = false;
+/*const RECRUITMENT_OPEN = false;
 const FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScTGJmwAstfJVomUN_0y13vcsy9xKu-ZtxWmAbxwjdwiiRnqQ/viewform?pli=1";
 
 const Hero = () => {
@@ -22,7 +22,7 @@ const Hero = () => {
         <div className="mb-6 px-5 py-2 rounded-full border border-white/20 bg-white/5 text-white/50 text-sm md:text-base">
           🔒 Recruitments are currently closed
         </div>
-      )}
+      )}*/
 
       {/* Logo with tilt effect */}
       <Tilt rotationFactor={24} isRevese>
