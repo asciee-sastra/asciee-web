@@ -248,14 +248,15 @@ export default function CoordinatorsPage() {
       </div>
 
       {/* Presidents */}
-      {renderGrid(presidents, "presidents")}
+     {renderGrid(presidents, "presidents")}
 
-      {/* Secretaries */}
-      {renderGrid(secretaries, "secretaries")}
+{secretaries.length > 0 && (
+  renderGrid(secretaries, "secretaries")
+)}
 
       {/* Department Heads */}
       <h1 className="flex items-center justify-center text-xl md:text-4xl font-bold mt-16 mb-4 text-white text-center">
-        Department Heads
+       Cluster Heads
       </h1>
 
       <div className="w-fit mx-auto">
