@@ -5,17 +5,21 @@ import logo from "@/public/asciee.jpg";
 import { Tilt } from "../motion-primitives/tilt";
 import { Boxes, Calendar } from "lucide-react";
 
-// ✏️ EDIT ONLY THESE TWO LINES WHEN RECRUITMENT CHANGES
-{/*const RECRUITMENT_OPEN = false;
-const FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScTGJmwAstfJVomUN_0y13vcsy9xKu-ZtxWmAbxwjdwiiRnqQ/viewform?pli=1";
-
 const Hero = () => {
   return (
     <section className="w-full bg-[url('/comp-mob.png')] md:bg-[url('/comp-bg.png')] bg-no-repeat bg-contain bg-center min-h-screen flex flex-col justify-center items-center text-center px-6 relative">
 
-        Recruitment Banner disabled
-        {RECRUITMENT_OPEN ? (
-        <a href={FORM_LINK} target="_blank" rel="noopener noreferrer" className="mb-6 px-5 py-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm text-white text-sm md:text-base hover:bg-white/20 hover:scale-105 transition-all duration-300 animate-pulse">
+      {/* Recruitment Banner — temporarily disabled
+      const RECRUITMENT_OPEN = false;
+      const FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScTGJmwAstfJVomUN_0y13vcsy9xKu-ZtxWmAbxwjdwiiRnqQ/viewform?pli=1";
+
+      {RECRUITMENT_OPEN ? (
+        <a
+          href={FORM_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mb-6 px-5 py-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm text-white text-sm md:text-base hover:bg-white/20 hover:scale-105 transition-all duration-300 animate-pulse"
+        >
           🎓 ASCIEE Recruitments are live — click here to register →
         </a>
       ) : (
@@ -23,7 +27,8 @@ const Hero = () => {
           🔒 Recruitments are currently closed
         </div>
       )}
-         */}
+      */}
+
       {/* Logo with tilt effect */}
       <Tilt rotationFactor={24} isRevese>
         <Image
@@ -41,6 +46,7 @@ const Hero = () => {
         <h1 className="text-4xl md:text-6xl font-bold text-white tracking-wide drop-shadow-lg">
           ASCIEE
         </h1>
+
         <p className="mt-3 text-md md:text-xl md:max-w-lg text-white/90 leading-relaxed">
           Association for the Students of Communication, Instrumentation,
           Electrical & Electronics
@@ -51,12 +57,15 @@ const Hero = () => {
       <div className="mt-4 flex flex-col sm:flex-row gap-3">
         <Link href="/events">
           <button className="flex items-center gap-2 glass-card text-md text-white rounded-3xl px-8 py-2 border border-white/20 backdrop-blur-sm hover:scale-105 hover:bg-white/20 hover:text-white transition-all">
-            <Calendar className="h-5 w-5" /> Upcoming Events
+            <Calendar className="h-5 w-5" />
+            Upcoming Events
           </button>
         </Link>
+
         <Link href="/inventory">
           <button className="flex items-center gap-2 mx-auto glass-card text-md text-white rounded-3xl px-8 py-2 border hover:scale-105 hover:bg-white/20 hover:text-white transition-all">
-            <Boxes className="h-6 w-6" /> Inventory
+            <Boxes className="h-6 w-6" />
+            Inventory
           </button>
         </Link>
       </div>
@@ -64,4 +73,5 @@ const Hero = () => {
     </section>
   );
 };
+
 export default Hero;
