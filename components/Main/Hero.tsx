@@ -13,8 +13,8 @@ const Hero = () => {
   return (
     <section className="w-full bg-[url('/comp-mob.png')] md:bg-[url('/comp-bg.png')] bg-no-repeat bg-contain bg-center min-h-screen flex flex-col justify-center items-center text-center px-6 relative">
 
-      {/* Recruitment Banner */}
-      {RECRUITMENT_OPEN ? (
+       {/* Recruitment Banner */}
+    {/*    {RECRUITMENT_OPEN ? (
         <a href={FORM_LINK} target="_blank" rel="noopener noreferrer" className="mb-6 px-5 py-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm text-white text-sm md:text-base hover:bg-white/20 hover:scale-105 transition-all duration-300 animate-pulse">
           🎓 ASCIEE Recruitments are live — click here to register →
         </a>
@@ -23,7 +23,7 @@ const Hero = () => {
           🔒 Recruitments are currently closed
         </div>
       )}
-         */
+         */}
       {/* Logo with tilt effect */}
       <Tilt rotationFactor={24} isRevese>
         <Image
