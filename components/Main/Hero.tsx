@@ -22,8 +22,8 @@ const Hero = () => {
         <div className="mb-6 px-5 py-2 rounded-full border border-white/20 bg-white/5 text-white/50 text-sm md:text-base">
           🔒 Recruitments are currently closed
         </div>
-      )}*/
-
+      )}
+         */
       {/* Logo with tilt effect */}
       <Tilt rotationFactor={24} isRevese>
         <Image
